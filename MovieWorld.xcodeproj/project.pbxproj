@@ -8,9 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		847EE33823F9587100BD3957 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847EE33723F9587100BD3957 /* AppDelegate.swift */; };
-		847EE33A23F9587100BD3957 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847EE33923F9587100BD3957 /* SceneDelegate.swift */; };
 		847EE33C23F9587100BD3957 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847EE33B23F9587100BD3957 /* ViewController.swift */; };
-		847EE33F23F9587100BD3957 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 847EE33D23F9587100BD3957 /* Main.storyboard */; };
 		847EE34123F9587400BD3957 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 847EE34023F9587400BD3957 /* Assets.xcassets */; };
 		847EE34423F9587400BD3957 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 847EE34223F9587400BD3957 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -18,9 +16,7 @@
 /* Begin PBXFileReference section */
 		847EE33423F9587100BD3957 /* MovieWorld.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieWorld.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		847EE33723F9587100BD3957 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		847EE33923F9587100BD3957 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		847EE33B23F9587100BD3957 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		847EE33E23F9587100BD3957 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		847EE34023F9587400BD3957 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		847EE34323F9587400BD3957 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		847EE34523F9587400BD3957 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -57,9 +53,7 @@
 			isa = PBXGroup;
 			children = (
 				847EE33723F9587100BD3957 /* AppDelegate.swift */,
-				847EE33923F9587100BD3957 /* SceneDelegate.swift */,
 				847EE33B23F9587100BD3957 /* ViewController.swift */,
-				847EE33D23F9587100BD3957 /* Main.storyboard */,
 				847EE34023F9587400BD3957 /* Assets.xcassets */,
 				847EE34223F9587400BD3957 /* LaunchScreen.storyboard */,
 				847EE34523F9587400BD3957 /* Info.plist */,
@@ -127,7 +121,6 @@
 			files = (
 				847EE34423F9587400BD3957 /* LaunchScreen.storyboard in Resources */,
 				847EE34123F9587400BD3957 /* Assets.xcassets in Resources */,
-				847EE33F23F9587100BD3957 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,21 +133,12 @@
 			files = (
 				847EE33C23F9587100BD3957 /* ViewController.swift in Sources */,
 				847EE33823F9587100BD3957 /* AppDelegate.swift in Sources */,
-				847EE33A23F9587100BD3957 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		847EE33D23F9587100BD3957 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				847EE33E23F9587100BD3957 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		847EE34223F9587400BD3957 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -286,6 +270,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = MovieWorld/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -293,7 +278,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = by.makarevich.MovieWorld;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -303,6 +288,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = MovieWorld/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -310,7 +296,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = by.makarevich.MovieWorld;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
