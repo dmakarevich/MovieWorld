@@ -17,7 +17,6 @@ DerivedData
 *.hmap
 UserInterfaceState.xcuserstate
 Pods/
-Podfile.lock
 *.xccheckout
 Build/
 
