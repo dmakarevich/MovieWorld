@@ -1,16 +1,17 @@
 //
-//  MVRoundImageView.swift
+//  MWEx+View.swift
 //  MovieWorld
 //
-//  Created by Admin on 18.02.2020.
+//  Created by Admin on 20.03.2020.
 //  Copyright © 2020 Admin. All rights reserved.
 //
 
 import UIKit
 
-class MWRoundImageView: UIImageView {
+
+extension UIView {
         
-    var cornerRadius: CGFloat {
+    public var cornerRadius: CGFloat {
         get {
             return self.layer.cornerRadius
         }
