@@ -10,11 +10,19 @@ import UIKit
 import SnapKit
 
 
+protocol MWMainCollectionCellDelegate: class {
+    func collectionView(collectionCell: MWMainCollectionCell?,
+                        didTappedInTableview TableCell: MWMainTableCell)
+    //other delegate methods that you can define to perform action in viewcontroller
+}
+
 class MWMainTableCell: UITableViewCell {
        
     class var reuseIdentifier: String {
         return "MWMainTableCell"
     }
+    
+    weak var cellDelegate: MWMainCollectionCellDelegate?
     
     fileprivate let collectionViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
     
@@ -86,6 +94,14 @@ extension MWMainTableCell: UICollectionViewDelegate, UICollectionViewDataSource 
         }
         
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView,
+                        didSelectItemAt indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath) as? MWMainCollectionCell
+   
+        self.cellDelegate?.collectionView(collectionCell: cell, didTappedInTableview: self)
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {

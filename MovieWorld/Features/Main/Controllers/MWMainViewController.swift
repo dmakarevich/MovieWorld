@@ -81,6 +81,8 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
             return MWMainTableCell()
         }
         
+        cell.cellDelegate = self
+        
         return cell
     }
     
@@ -96,8 +98,34 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         header.titleLabel.text = self.categories[section]
+        header.allButton.addTarget(self, action: #selector(self.headerAllButtonClicked), for: .touchUpInside)
         
         return header
     }
+      
+    @objc
+    func headerAllButtonClicked() {
+        let moviesInSection = MWViewController()
+        moviesInSection.title = "All Movies"
+        moviesInSection.view.backgroundColor = .white
+        
+        MWI.sh.push(vc: moviesInSection)
+    }
     
+}
+
+
+extension MWMainViewController: MWMainCollectionCellDelegate {
+    
+    func collectionView(collectionCell: MWMainCollectionCell?,
+                        didTappedInTableview TableCell: MWMainTableCell) {
+        
+        print("Delegate in MWMainViewController")
+        
+        let moviesInSection = MWViewController()
+        moviesInSection.title = "21 Мост"
+        moviesInSection.view.backgroundColor = .white
+        
+        MWI.sh.push(vc: moviesInSection)
+    }
 }
