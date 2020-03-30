@@ -12,20 +12,22 @@ import SnapKit
 
 class MWMainViewController: MWViewController {
     
-    fileprivate let tableViewInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
-    fileprivate let categories: [String] = ["New", "Moves", "Series and Shows", "Animated movies"]
-    fileprivate var selectCategory: String?
+    // MARK: - Variables
     
-    fileprivate lazy var tableView: UITableView = {
+    private let tableViewInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+    private let categories: [String] = ["New", "Moves", "Series and Shows", "Animated movies"]
+    private var selectCategory: String?
+    
+    private lazy var tableView: UITableView = {
         var tableView = UITableView()
         tableView.allowsSelection = false
         tableView.register(MWMainTableCell.self,
-                    forCellReuseIdentifier: MWMainTableCell.reuseIdentifier)
-        tableView.register(MWMainTableHeader.self, forHeaderFooterViewReuseIdentifier: MWMainTableHeader.headerReuseId)
+                           forCellReuseIdentifier: MWMainTableCell.reuseIdentifier)
+        tableView.register(MWMainTableHeader.self,
+                           forHeaderFooterViewReuseIdentifier: MWMainTableHeader.headerReuseId)
         
         return tableView
     } ()
-    
     
     //MARK: - Lifecycle
     
@@ -54,12 +56,13 @@ class MWMainViewController: MWViewController {
         self.tableView.snp.makeConstraints { (make) in
             make.top.bottom.left.right.equalToSuperview().inset(self.tableViewInsets)
         }
-        
     }
        
 }
 
 extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    //MARK: - TableView Delegate and DataSource Methods
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return  self.categories.count
@@ -76,8 +79,8 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: MWMainTableCell.reuseIdentifier, for: indexPath) as? MWMainTableCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: MWMainTableCell.reuseIdentifier,
+                                                       for: indexPath) as? MWMainTableCell else {
             return MWMainTableCell()
         }
         
@@ -85,6 +88,8 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
         
         return cell
     }
+    
+    //MARK: - TableView Header
     
     func tableView(_ tableView: UITableView,
                    heightForHeaderInSection section: Int) -> CGFloat {
@@ -102,10 +107,12 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
         
         return header
     }
+    
+    //MARK: - Selector action methods
       
     @objc
     func headerAllButtonClicked() {
-        let moviesInSection = MWViewController()
+        let moviesInSection = MWMainAllMoviesViewController()
         moviesInSection.title = "All Movies"
         moviesInSection.view.backgroundColor = .white
         
@@ -120,10 +127,8 @@ extension MWMainViewController: MWMainCollectionCellDelegate {
     func collectionView(collectionCell: MWMainCollectionCell?,
                         didTappedInTableview TableCell: MWMainTableCell) {
         
-        print("Delegate in MWMainViewController")
-        
         let moviesInSection = MWViewController()
-        moviesInSection.title = "21 Мост"
+        moviesInSection.title = "21 Bridges"
         moviesInSection.view.backgroundColor = .white
         
         MWI.sh.push(vc: moviesInSection)

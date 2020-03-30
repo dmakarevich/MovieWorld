@@ -17,6 +17,8 @@ protocol MWMainCollectionCellDelegate: class {
 }
 
 class MWMainTableCell: UITableViewCell {
+    
+    //MARK: - Vasriables
        
     class var reuseIdentifier: String {
         return "MWMainTableCell"
@@ -24,7 +26,7 @@ class MWMainTableCell: UITableViewCell {
     
     weak var cellDelegate: MWMainCollectionCellDelegate?
     
-    fileprivate let collectionViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+    private let collectionViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
     
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
@@ -36,11 +38,11 @@ class MWMainTableCell: UITableViewCell {
         return flowLayout
     }()
     
-    lazy var collectionView: UICollectionView = {
+    private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: self.flowLayout)
         cv.backgroundColor = .white
-        cv.translatesAutoresizingMaskIntoConstraints = false
         cv.register(MWMainCollectionCell.self, forCellWithReuseIdentifier: MWMainCollectionCell.cellReuseIdentifier)
+        
         return cv
     } ()
 
@@ -53,14 +55,7 @@ class MWMainTableCell: UITableViewCell {
         self.collectionView.dataSource = self
         self.collectionView.delegate = self
         
-        initialCell()
         makeConstraints()
-    }
-    
-    
-    fileprivate func initialCell() {
-        self.translatesAutoresizingMaskIntoConstraints = false
-        
     }
     
     required init?(coder: NSCoder) {
@@ -69,10 +64,8 @@ class MWMainTableCell: UITableViewCell {
     
     func makeConstraints() {
         self.collectionView.snp.makeConstraints { (make) in
-            make.top.equalTo(self.contentView.snp.top).inset(self.collectionViewInsets.top)
-            make.leading.equalTo(self.contentView.snp.leading).inset(self.collectionViewInsets.left)
+            make.top.leading.bottom.equalToSuperview()
             make.trailing.equalTo(self.contentView.snp.trailing).inset(self.collectionViewInsets.right)
-            make.bottom.equalTo(self.contentView.snp.bottom).inset(self.collectionViewInsets.bottom)
         }
     }
 }
@@ -103,8 +96,8 @@ extension MWMainTableCell: UICollectionViewDelegate, UICollectionViewDataSource 
         self.cellDelegate?.collectionView(collectionCell: cell, didTappedInTableview: self)
         
     }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
-    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+//        return UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+//    }
 }

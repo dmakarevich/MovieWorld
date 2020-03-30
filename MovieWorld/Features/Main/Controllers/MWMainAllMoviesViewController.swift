@@ -57,7 +57,7 @@ class MWMainAllMoviesViewController: MWViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
             
-        setupData()
+        self.setupData()
                 
         self.tableView.delegate = self
         self.tableView.dataSource = self
@@ -96,6 +96,8 @@ class MWMainAllMoviesViewController: MWViewController {
     }
 }
 
+//MARK: - Extension for protols UICollectionViewDelegate and UICollectionViewDataSource
+
 extension MWMainAllMoviesViewController: UICollectionViewDelegate, UICollectionViewDataSource{
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -107,12 +109,12 @@ extension MWMainAllMoviesViewController: UICollectionViewDelegate, UICollectionV
                                                             for: indexPath) as? MWFilterCategoriesCollectionViewCell else {
             return MWFilterCategoriesCollectionViewCell()
         }
-        //self.categoriesFilters[indexPath.row]
         
         return cell
     }
 }
 
+//MARK: - Extension for protols UITableViewDelegate and UITableViewDataSource
 
 extension MWMainAllMoviesViewController: UITableViewDelegate, UITableViewDataSource {
         

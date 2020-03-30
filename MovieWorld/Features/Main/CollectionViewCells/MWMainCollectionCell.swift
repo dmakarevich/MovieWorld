@@ -27,7 +27,7 @@ class MWMainCollectionCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        initialize()
+        self.initialize()
     }
     
     required init?(coder: NSCoder) {
@@ -76,7 +76,6 @@ class MWMainCollectionCell: UICollectionViewCell {
          self.subtitle.snp.makeConstraints { (make) in
              make.top.equalTo(self.title.snp.bottom).inset(0)
              make.left.equalToSuperview().offset(0)
-            // make.bottom.equalToSuperview().offset(0)
          }
       }
     
