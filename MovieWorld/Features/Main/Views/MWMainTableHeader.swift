@@ -63,7 +63,6 @@ class MWMainTableHeader: UITableViewHeaderFooterView {
         }
         
         self.allButton.snp.makeConstraints{ (make) in
-           // make.top.equalToSuperview().inset(self.allButtonInsets.top)
             make.right.equalToSuperview().inset(self.allButtonInsets.right)
             make.height.equalTo(24)
             make.width.equalTo(52)

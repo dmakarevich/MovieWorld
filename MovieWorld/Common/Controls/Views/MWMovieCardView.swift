@@ -81,7 +81,7 @@ class MWMovieCardView: UIView {
         }
 
         self.subtitle.snp.makeConstraints { (make) in
-            make.top.equalTo(self.title.snp.bottom).offset(self.titleEdgeInsets.top)
+            make.top.equalTo(self.title.snp.bottom).offset(self.titleEdgeInsets.bottom)
             make.left.equalTo(self.coverImage.snp.right).offset(self.titleEdgeInsets.left)
             make.right.equalToSuperview().offset(self.titleEdgeInsets.right)
         }
