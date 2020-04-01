@@ -19,6 +19,8 @@ class MWViewController: UIViewController {
         
         self.tabBarItem.title = self.barTitle
         self.tabBarItem.image = UIImage(named: self.barImage)
+        
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
   
     func createNavigationVC() -> UINavigationController {

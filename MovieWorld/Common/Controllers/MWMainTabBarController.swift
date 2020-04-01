@@ -16,9 +16,9 @@ class MWMainTabBarController: UITabBarController {
     
     
     override func viewDidLoad() {
-        mainVC.setup(title: "Main", imageName: "mainBarIcon")
-        categoryVC.setup(title: "Category", imageName: "categoryBarIcon")
-        searchVC.setup(title: "Search", imageName: "searchBarIcon")
+        self.mainVC.setup(title: "Main", imageName: "mainBarIcon")
+        self.categoryVC.setup(title: "Category", imageName: "categoryBarIcon")
+        self.searchVC.setup(title: "Search", imageName: "searchBarIcon")
         
         let tabBarList = [mainVC.createNavigationVC(),
                           categoryVC.createNavigationVC(),
