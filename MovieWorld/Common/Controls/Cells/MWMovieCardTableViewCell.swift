@@ -16,41 +16,30 @@ class MWMovieCardTableViewCell: UITableViewCell {
         return "MovieCardCell"
     }
     
-    var contentCellView: MWShadowView = MWShadowView()
-    var cellView: MWMovieCardView = MWMovieCardView()
+    var cellContentView: MWMovieCardView = MWMovieCardView()
     
-    private var contentCellViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 5, right: 0)
+    private var cellContentViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 5, right: 0)
     
     //MARK: - Initialization
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        self.cellView.initialize()
-        self.initCellData()
+        self.contentView.addSubview(self.cellContentView)
+        
+        self.makeConstraint()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func initCellData() {
-        self.contentView.addSubview(self.contentCellView)
-        self.contentCellView.addSubview(self.cellView)
-        
-        self.makeConstraint()
-    }
-    
     //MARK: - Add constraints
     
     private func makeConstraint() {
-        self.cellView.snp.makeConstraints{ make in
+        self.cellContentView.snp.makeConstraints{ make in
             make.top.left.right.bottom.equalToSuperview()
-        }
-        
-        self.contentCellView.snp.makeConstraints { make in
-            make.top.left.right.bottom.equalToSuperview()
-                .inset(self.contentCellViewInsets)
+            .inset(self.cellContentViewInsets)
         }
     }
 }

@@ -8,14 +8,50 @@
 
 import UIKit
 
-class MWMovieCardView: UIView {
+class MWMovieCardView: MWShadowView {
       
     //MARK: - Variables
       
-    var coverImage: UIImageView = UIImageView()
-    var title: UILabel = UILabel()
-    var subtitle: UILabel = UILabel()
-    var categories: UILabel = UILabel()
+    lazy var coverImage: UIImageView = {
+        let iv = UIImageView()
+        iv.cornerRadius = 5
+        iv.image = UIImage(named: "defaultCard")
+        
+        return iv
+    }()
+    
+    lazy var title: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        label.textColor = UIColor(named: "textColor")
+        label.text = "21 Bridges"
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        
+        return label
+    }()
+    
+    lazy var subtitle: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.textColor = UIColor(named: "textColor")
+        label.text = "2019, USA"
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        
+        return label
+    } ()
+    
+    lazy var categories: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 13)
+        label.textColor = UIColor(named: "textColor")?.withAlphaComponent(0.5)
+        label.text = "Drama, Crime, Foreign"
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        
+        return label
+    } ()
       
     private var imageSize = CGSize(width: 70, height: 100)
       
@@ -32,38 +68,11 @@ class MWMovieCardView: UIView {
         self.addSubview(self.subtitle)
         self.addSubview(self.categories)
         
-        self.initialize()
+        self.makeConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func initialize() {
-        self.backgroundColor = .white
-          
-        self.coverImage.cornerRadius = 5
-        self.coverImage.image = UIImage(named: "defaultCard")
-          
-        self.title.font = UIFont.systemFont(ofSize: 17, weight: .bold)
-        self.title.textColor = UIColor(named: "textColor")
-        self.title.text = "21 Bridges"
-        self.title.numberOfLines = 0
-        self.title.lineBreakMode = .byWordWrapping
-          
-        self.subtitle.font = UIFont.systemFont(ofSize: 13)
-        self.subtitle.textColor = .black
-        self.subtitle.text = "2019, USA"
-        self.subtitle.numberOfLines = 0
-        self.subtitle.lineBreakMode = .byWordWrapping
-          
-        self.categories.font = UIFont.systemFont(ofSize: 13)
-        self.categories.textColor = UIColor(named: "textColor")?.withAlphaComponent(0.5)
-        self.categories.text = "Drama, Crime, Foreign"
-        self.categories.numberOfLines = 0
-        self.categories.lineBreakMode = .byWordWrapping
-          
-        self.makeConstraints()
     }
       
     //MARK: - Add Constraints
