@@ -14,7 +14,7 @@ class MWMainViewController: MWViewController {
     
     // MARK: - Variables
     
-    private let tableViewInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+    private let tableViewInsets = UIEdgeInsets(top: 12, left: 16, bottom: 0, right: 0)
     private let categories: [String] = ["New", "Moves", "Series and Shows", "Animated movies"]
     private var selectCategory: String?
     
@@ -54,7 +54,8 @@ class MWMainViewController: MWViewController {
     
     func tableViewPosition() {
         self.tableView.snp.makeConstraints { (make) in
-            make.top.bottom.left.right.equalToSuperview().inset(self.tableViewInsets)
+            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top).inset(self.tableViewInsets)
+            make.bottom.left.right.equalToSuperview().inset(self.tableViewInsets)
         }
     }
        
@@ -74,7 +75,7 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 240
+        return 249
     }
     
     func tableView(_ tableView: UITableView,

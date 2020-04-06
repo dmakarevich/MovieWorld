@@ -13,7 +13,6 @@ import SnapKit
 protocol MWMainCollectionCellDelegate: class {
     func collectionView(collectionCell: MWMainCollectionCell?,
                         didTappedInTableview TableCell: MWMainTableCell)
-    //other delegate methods that you can define to perform action in viewcontroller
 }
 
 class MWMainTableCell: UITableViewCell {
@@ -32,9 +31,8 @@ class MWMainTableCell: UITableViewCell {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
         flowLayout.itemSize = CGSize(width: 130, height: 237)
-        flowLayout.minimumLineSpacing = 8.0
-        flowLayout.minimumInteritemSpacing = 5.0
-                
+        flowLayout.minimumInteritemSpacing = 8.0
+        flowLayout.sectionInset.bottom = 12
         return flowLayout
     }()
     
@@ -64,8 +62,7 @@ class MWMainTableCell: UITableViewCell {
     
     func makeConstraints() {
         self.collectionView.snp.makeConstraints { (make) in
-            make.top.leading.bottom.equalToSuperview()
-            make.trailing.equalTo(self.contentView.snp.trailing).inset(self.collectionViewInsets.right)
+            make.top.leading.trailing.bottom.equalToSuperview().inset(self.collectionViewInsets)
         }
     }
 }
@@ -94,10 +91,6 @@ extension MWMainTableCell: UICollectionViewDelegate, UICollectionViewDataSource 
         let cell = collectionView.cellForItem(at: indexPath) as? MWMainCollectionCell
    
         self.cellDelegate?.collectionView(collectionCell: cell, didTappedInTableview: self)
-        
     }
-//    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-//        return UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
-//    }
+    
 }

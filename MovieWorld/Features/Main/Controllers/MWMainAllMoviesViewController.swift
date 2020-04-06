@@ -12,10 +12,7 @@ class MWMainAllMoviesViewController: MWViewController {
     
     // MARK: - Variables
     
-    private let tableCellReuseIdentifier: String = "allMoviesTableCellReuseIdentifier"
-    private let collectionCellReuseIdentifier: String = "allMoviesCollectionCellReuseIdentifier"
-    
-    private let collecttionViewInsets = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 0)
+    private let collecttionViewSectionInsets = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 0)
     
     private let categoriesFilters: [String] = ["Comedy", "Drama", "Foreign",
                                                "Crime", "Fiction", "Musicial",
@@ -26,10 +23,9 @@ class MWMainAllMoviesViewController: MWViewController {
         let flowLayout = UICollectionViewFlowLayout()
 
         flowLayout.scrollDirection = .horizontal
-        flowLayout.itemSize = CGSize(width: 70, height: 26)
-        flowLayout.minimumLineSpacing = 10.0
-        flowLayout.minimumInteritemSpacing = 8.0
-        flowLayout.sectionInset = self.collecttionViewInsets
+        flowLayout.minimumLineSpacing = 8.0
+        flowLayout.minimumInteritemSpacing = 10.0
+        flowLayout.sectionInset = self.collecttionViewSectionInsets
                 
         return flowLayout
     }()
@@ -48,7 +44,7 @@ class MWMainAllMoviesViewController: MWViewController {
         tableView.allowsSelection = false
         tableView.separatorStyle = .none
         tableView.register(MWMovieCardTableViewCell.self,
-                           forCellReuseIdentifier: self.tableCellReuseIdentifier)
+                           forCellReuseIdentifier: MWMovieCardTableViewCell.cellReuseIdentifier)
         return tableView
     } ()
         
@@ -99,18 +95,37 @@ class MWMainAllMoviesViewController: MWViewController {
 //MARK: - Extension for protols UICollectionViewDelegate and UICollectionViewDataSource
 
 extension MWMainAllMoviesViewController: UICollectionViewDelegate, UICollectionViewDataSource{
-    
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 11
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MWFilterCategoriesCollectionViewCell.cellReuseIdentifier,
                                                             for: indexPath) as? MWFilterCategoriesCollectionViewCell else {
             return MWFilterCategoriesCollectionViewCell()
         }
+
+        cell.filterLabel.text = self.categoriesFilters[indexPath.row]
         
         return cell
+    }
+}
+
+extension MWMainAllMoviesViewController: UICollectionViewDelegateFlowLayout {
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MWFilterCategoriesCollectionViewCell.cellReuseIdentifier,
+                                                            for: indexPath) as? MWFilterCategoriesCollectionViewCell else {
+            return CGSize()
+        }
+        
+        let category = self.categoriesFilters[indexPath.row]
+        let fontAttributes = [NSAttributedString.Key.font: cell.filterLabel.font!]//UIFont.systemFont(ofSize: 13)]
+        let width = category.size(withAttributes: fontAttributes).width
+
+        return CGSize(width: width + 24, height: 26)
     }
 }
 
@@ -133,7 +148,7 @@ extension MWMainAllMoviesViewController: UITableViewDelegate, UITableViewDataSou
         
     func tableView(_ tableView: UITableView,
                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: self.tableCellReuseIdentifier,
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: MWMovieCardTableViewCell.cellReuseIdentifier,
                                                  for: indexPath) as? MWMovieCardTableViewCell else {
             return MWMovieCardTableViewCell()
         }
