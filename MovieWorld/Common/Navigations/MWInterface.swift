@@ -15,25 +15,22 @@ class MWInterface {
     static let sh = MWInterface()
     
     weak var window: UIWindow?
-    
     private lazy var tabBarController = MWMainTabBarController()
     
-    private init() {}
-    
     func setup(window: UIWindow) {
-        
         self.window = window
-        
         self.setUpNavigationBarStyle()
         
         window.rootViewController = self.tabBarController
         window.makeKeyAndVisible()
     }
     
+    private init() {}
+    
     private func setUpNavigationBarStyle() {
         let standartNavBar = UINavigationBar.appearance()
         standartNavBar.backgroundColor = .white
-        standartNavBar.tintColor = UIColor(named: "accentColor")
+        standartNavBar.tintColor = UIColor(named: Constants.Colors.accentColor)
         standartNavBar.prefersLargeTitles = true
         
         let newNavBar = UINavigationBarAppearance()
