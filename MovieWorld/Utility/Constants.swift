@@ -32,4 +32,16 @@ struct Constants {
         static let size17: CGFloat = 17
         static let size24: CGFloat = 24
     }
+    
+    struct BarIcon {
+        static let main: String = "mainBarIcon"
+        static let category: String = "categoryBarIcon"
+        static let search: String = "searchBarIcon"
+    }
+    
+    struct BarTitle {
+        static let main: String = "Main"
+        static let category: String = "Category"
+        static let search: String = "Search"
+    }
 }
