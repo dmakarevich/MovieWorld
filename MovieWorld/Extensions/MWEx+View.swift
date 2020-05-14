@@ -8,10 +8,9 @@
 
 import UIKit
 
-
 extension UIView {
-        
-    public var cornerRadius: CGFloat {
+    //MARK: - Variables
+    var cornerRadius: CGFloat {
         get {
             return self.layer.cornerRadius
         }
@@ -19,5 +18,4 @@ extension UIView {
             return self.layer.cornerRadius = newValue
         }
     }
-
 }

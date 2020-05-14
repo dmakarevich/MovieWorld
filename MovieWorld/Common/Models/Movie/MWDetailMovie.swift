@@ -8,32 +8,33 @@
 
 import Foundation
 
-
 class MWDetailMovie: MWMovie {
-
+    //MARK: - Enums
     enum CodingKeys: String, CodingKey {
         case categories = "genres"
         case productionCountries = "production_countries"
         case imdbId = "imdb_id"
         case status
     }
-    
+
+    //MARK: - Variables
     let categories: [MWCategory]
     let productionCountries: [MWCountry]
     let status: String
     let imdbId: String
-    
+
+    //MARK: - Initialization
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         self.categories = (try? container.decode([MWCategory].self, forKey: .categories)) ?? []
         self.productionCountries = (try? container.decode([MWCountry].self, forKey: .productionCountries)) ?? []
-        self.status = (try? container.decode(String.self, forKey: .status)) ?? Constants.emptyString
-        self.imdbId = (try? container.decode(String.self, forKey: .imdbId)) ?? Constants.emptyString
-        
+        self.status = (try? container.decode(String.self, forKey: .status)) ?? ""
+        self.imdbId = (try? container.decode(String.self, forKey: .imdbId)) ?? ""
+
         try super.init(from: decoder)
     }
-        
+
     override func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -41,18 +42,37 @@ class MWDetailMovie: MWMovie {
         try container.encode(self.productionCountries, forKey: .productionCountries)
         try container.encode(self.status, forKey: .status)
         try container.encode(self.imdbId, forKey: .imdbId)
-        
+
         try super.encode(to: encoder)
     }
 
     //MARK: - get production country names as string
     func getProductionCountriesString() -> String {
-        var result: String = Constants.emptyString
+        var result: String = ""
         self.productionCountries.forEach({ (country) in
             result += Constants.commaDelimiter + country.name
         })
-        
+
         return result
     }
 
+    override func getCategoryString() -> String {
+        var result = ""
+        self.categories.forEach({ (category) in
+            result += self.categories.first?.id != category.id ? Constants.commaDelimiter : ""
+            result += category.name
+        })
+
+        return result
+    }
+
+    override func getSubtitle() -> String {
+        var result = ""
+        if let year = self.getReleaseYear() {
+            result += year
+        }
+        result += self.getProductionCountriesString()
+
+        return result
+    }
 }

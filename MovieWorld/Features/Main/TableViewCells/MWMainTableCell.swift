@@ -9,90 +9,89 @@
 import UIKit
 import SnapKit
 
-
-protocol MWMainCollectionCellDelegate: class {
-    func collectionView(collectionCell: MWMainCollectionCell?,
-                        didTappedInTableview TableCell: MWMainTableCell)
-}
-
 class MWMainTableCell: UITableViewCell {
-    //MARK: - Variables    
-    static var reuseIdentifier: String {
-        return "MWMainTableCell"
-    }
-    
-    weak var cellDelegate: MWMainCollectionCellDelegate?
-    var movies: [MWMovie]?
-    
+    //MARK: - Variables
+    static var reuseIdentifier: String = "MWMainTableCell"
+    private var movies: [MWMovie]?
     private let collectionViewInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
-    
-    //MARK: - Gui variables    
+
+    //MARK: - Gui variables
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
-        flowLayout.itemSize = CGSize(width: 130, height: 237)
+        flowLayout.itemSize = CGSize(width: 130, height: 235)
         flowLayout.minimumInteritemSpacing = 8.0
-        flowLayout.sectionInset.bottom = 12
-        
+        flowLayout.sectionInset.bottom = 5
+
         return flowLayout
     } ()
-    
-    lazy var collectionView: UICollectionView = {
+
+    private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: self.flowLayout)
-        cv.backgroundColor = .white
+        cv.dataSource = self
+        cv.delegate = self
+
         cv.register(MWMainCollectionCell.self, forCellWithReuseIdentifier: MWMainCollectionCell.cellReuseIdentifier)
-        
+        cv.backgroundColor = .white
+
         return cv
     } ()
-    
+
     //MARK: - Initialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
+
         self.contentView.addSubview(collectionView)
-        self.collectionView.dataSource = self
-        self.collectionView.delegate = self
-        
-        self.makeConstraints()
+        self.updateConstraints()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     //MARK: - Constraints
-    func makeConstraints() {
-        self.collectionView.snp.makeConstraints { (make) in
-            make.top.leading.trailing.bottom.equalToSuperview().inset(self.collectionViewInsets)
+    override func updateConstraints() {
+        self.collectionView.snp.updateConstraints { (make) in
+            make.edges.equalTo(self.contentView).inset(self.collectionViewInsets)
         }
+
+        super.updateConstraints()
+    }
+
+    func set(movies: [MWMovie]?) {
+        self.movies = movies
+        self.collectionView.reloadData()
+        self.setNeedsUpdateConstraints()
     }
 }
 
 //MARK: - Collection view Datasource and Delegate Methods
 extension MWMainTableCell: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return movies?.count ?? 1
     }
-    
+
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MWMainCollectionCell.cellReuseIdentifier, for: indexPath) as? MWMainCollectionCell else {
-            return MWMainCollectionCell()
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MWMainCollectionCell.cellReuseIdentifier, for: indexPath)
+
+        if let movie = self.movies?[indexPath.row] {
+            (cell as? MWMainCollectionCell)?.set(movie: movie)
         }
-        if let movies = self.movies {
-            let movie = movies[indexPath.row]
-            cell.title.text = movie.title
-            cell.movieId = movie.id
-            cell.subtitle.text = movie.getReleaseYear() + Constants.commaDelimiter + movie.originalLanguage
-        }
-        
+
         return cell
     }
-    
+
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as? MWMainCollectionCell
-        
-        self.cellDelegate?.collectionView(collectionCell: cell, didTappedInTableview: self)
+        let moviesInSection = MWDetailMovieViewController()
+        moviesInSection.view.backgroundColor = .white
+
+        if let id = cell?.movieId {
+            moviesInSection.getMovie(movieId: id)
+
+            MWI.sh.push(vc: moviesInSection)
+        }
     }
 }

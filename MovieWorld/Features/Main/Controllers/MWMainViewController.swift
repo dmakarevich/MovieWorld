@@ -9,70 +9,87 @@
 import UIKit
 import SnapKit
 
-
+typealias MoviesCatalog = (String, [MWMovie])
 
 class MWMainViewController: MWViewController {
     // MARK: - Variables
-    private let tableViewInsets = UIEdgeInsets(top: 12, left: 16, bottom: 0, right: 0)
+    private let tableViewInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 0)
     private var categories: [String] = ["Now Playing", "Popular", "Top Rated", "Upcoming"]
     private var popularMovies: [MWMovie]?
     private var selectCategory: String?
-    private let tableHeaderHeight: CGFloat = 56
-    private let tableCellHeight: CGFloat = 249
-    
+    private let tableCellHeight: CGFloat = 240
+
     // MARK: - Gui variables
     private lazy var tableView: UITableView = {
         var tableView = UITableView()
+        tableView.delegate = self
+        tableView.dataSource = self
         tableView.allowsSelection = false
+        tableView.separatorStyle = .none
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(MWMainTableCell.self,
                            forCellReuseIdentifier: MWMainTableCell.reuseIdentifier)
         tableView.register(MWMainTableHeader.self,
                            forHeaderFooterViewReuseIdentifier: MWMainTableHeader.headerReuseId)
-        
+
         return tableView
     } ()
-    
+
     //MARK: - Fetch data for initialization
     private func setupData() {
-        self.view.backgroundColor = .white
-        self.navigationItem.title = "Seasons"
-        self.fetchPopularMovies()
-        
         self.view.addSubview(self.tableView)
+        self.makeContraints()
     }
-    
-    func fetchPopularMovies() {
-        let success: SuccessHandler = { (responseData: MWResponseMovie) in
-            let movies: [MWMovie] = responseData.results
-            self.popularMovies = movies
 
-            self.tableView.reloadData()
+    func fetchPopularMovies() {
+        let success: SuccessHandler = { [weak self] (responseData: MWResponseMovie) in
+            guard let self = self else { return }
+            let movies: [MWMovie] = responseData.results
+
+            self.fetchImages(movies: movies)
         }
-        
-        MWNet.sh.request(URLPaths.popularMovies,
-                         ["language": URLLanquage.by.urlValue],
+
+        MWNet.sh.request(urlPath: URLPaths.popularMovies,
+                         queryParameters: ["language": URLLanguage.by.urlValue],
                          of: MWResponseMovie.self,
                          successHandler: success)
     }
-    
+
+    func fetchImages(movies: [MWMovie]) {
+        let dispatch = DispatchGroup()
+        movies.forEach ({ (movie) in
+            let completion: CompetionImageHandler = { (data) in
+                movie.image = data
+                dispatch.leave()
+            }
+
+            dispatch.enter()
+            MWNet.sh.getImage(imagePath: movie.poster,
+                              size: .w185,
+                              handler: completion)
+        })
+
+        dispatch.notify(queue: .main) {
+            self.popularMovies = movies
+            self.setupData()
+        }
+    }
+
     //MARK: - Data initlisers methods
     func makeContraints() {
         self.tableView.snp.makeConstraints { (make) in
-            make.top.equalTo(self.view.safeAreaLayoutGuide.snp.top).inset(self.tableViewInsets)
-            make.bottom.left.right.equalToSuperview().inset(self.tableViewInsets)
+            make.top.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(self.tableViewInsets)
+            make.left.right.equalToSuperview().inset(self.tableViewInsets)
         }
     }
-    
+
     //MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setupData()
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        
-        self.makeContraints()
-        self.tableView.reloadData()
+
+        self.view.backgroundColor = .white
+        self.navigationItem.title = "Seasons"
+        self.fetchPopularMovies()
     }
 }
 
@@ -81,72 +98,45 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return  self.categories.count
     }
-    
+
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
         return 1
     }
-    
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return self.tableCellHeight
     }
-    
+
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView
-            .dequeueReusableCell(withIdentifier: MWMainTableCell.reuseIdentifier,
-                                 for: indexPath) as? MWMainTableCell else {
-                                    return MWMainTableCell()
-        }
-        cell.cellDelegate = self
-        cell.movies = self.popularMovies
-        cell.collectionView.reloadData()
-        
+        let cell = tableView.dequeueReusableCell(withIdentifier: MWMainTableCell.reuseIdentifier,
+        for: indexPath)
+        (cell as? MWMainTableCell)?.set(movies: self.popularMovies)
+
         return cell
     }
-    
+
     //MARK: - TableView Header
     func tableView(_ tableView: UITableView,
-                   heightForHeaderInSection section: Int) -> CGFloat {
-        return self.tableHeaderHeight
-    }
-    
-    func tableView(_ tableView: UITableView,
-                   viewForHeaderInSection section: Int) -> UIView? {        
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: MWMainTableHeader.headerReuseId) as? MWMainTableHeader else {
-            return MWMainTableHeader()
-        }
-        header.titleLabel.text = self.categories[section]
-        header.allButton.addTarget(self,
-                                   action: #selector(self.headerAllButtonClicked),
-                                   for: .touchUpInside)
-        
+                   viewForHeaderInSection section: Int) -> UIView? {
+        let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: MWMainTableHeader.headerReuseId)
+        (header as? MWMainTableHeader)?.set(title: self.categories[section])
+
+        let headerTapGesture = UITapGestureRecognizer(target: self,
+                               action: #selector(self.headerAllButtonClicked))
+        headerTapGesture.numberOfTapsRequired = 1
+        header?.addGestureRecognizer(headerTapGesture)
+
         return header
     }
-    
+
     //MARK: - Selector action methods
-    @objc
-    func headerAllButtonClicked() {
+    @objc func headerAllButtonClicked() {
         let moviesInSection = MWMainAllMoviesViewController()
         moviesInSection.title = "Movies"
         moviesInSection.view.backgroundColor = .white
-        
-        MWI.sh.push(vc: moviesInSection)
-    }
-}
 
-//MARK: - MWMainCollectionCellDelegate Method
-extension MWMainViewController: MWMainCollectionCellDelegate {
-    func collectionView(collectionCell: MWMainCollectionCell?,
-                        didTappedInTableview TableCell: MWMainTableCell) {
-        let moviesInSection = MWViewController()
-        moviesInSection.title = collectionCell?.title.text
-        moviesInSection.view.backgroundColor = .white
-        
-        if let id = collectionCell?.movieId {
-            moviesInSection.fetchMovie(movieId: id)
-            
-            MWI.sh.push(vc: moviesInSection)
-        }
+        MWI.sh.push(vc: moviesInSection)
     }
 }

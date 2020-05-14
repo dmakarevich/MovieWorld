@@ -13,7 +13,7 @@ struct MWCountry: Codable {
         case id = "iso_3166_1"
         case name
     }
-    
+
     let id: String
     let name: String
 }

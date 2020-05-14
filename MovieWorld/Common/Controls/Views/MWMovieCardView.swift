@@ -9,96 +9,111 @@
 import UIKit
 
 class MWMovieCardView: MWShadowView {
-      
-    //MARK: - Variables
-      
-    lazy var coverImage: UIImageView = {
+    //MARK: - Variables      
+    private lazy var coverImage: UIImageView = {
         let iv = UIImageView()
         iv.cornerRadius = 5
-        iv.image = UIImage(named: "defaultCard")
-        
+        iv.image = UIImage(named: Constants.Images.defaultCard)
+
         return iv
     }()
-    
-    lazy var title: UILabel = {
+
+    private lazy var title: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 17, weight: .bold)
-        label.textColor = UIColor(named: "textColor")
-        label.text = "21 Bridges"
+        label.textColor = UIColor(named: Constants.Colors.textColor)
+        label.text = "Title"
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
-        
+
         return label
     }()
-    
-    lazy var subtitle: UILabel = {
+
+    private lazy var subtitle: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 13)
-        label.textColor = UIColor(named: "textColor")
-        label.text = "2019, USA"
+        label.textColor = UIColor(named: Constants.Colors.textColor)
+        label.text = "Year, Country"
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
-        
+
         return label
     } ()
-    
-    lazy var categories: UILabel = {
+
+    private lazy var categories: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 13)
-        label.textColor = UIColor(named: "textColor")?.withAlphaComponent(0.5)
-        label.text = "Drama, Crime, Foreign"
+        label.textColor = UIColor(named: Constants.Colors.textColor)?.withAlphaComponent(0.5)
+        label.text = "Categories"
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
-        
+
         return label
     } ()
-      
+
     private var imageSize = CGSize(width: 70, height: 100)
-      
     private let coverImageEdgeInsets = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 8)
-    private let titleEdgeInsets = UIEdgeInsets(top: 10, left: 16, bottom: 3, right: 70)
-      
+    private let titleEdgeInsets = UIEdgeInsets(top: 10, left: 16, bottom: 3, right: 30)
+
     //MARK: - Initialize
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
         self.addSubview(self.coverImage)
         self.addSubview(self.title)
         self.addSubview(self.subtitle)
         self.addSubview(self.categories)
-        
+
         self.makeConstraints()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-      
+
     //MARK: - Add Constraints
-      
     func makeConstraints() {
+        self.translatesAutoresizingMaskIntoConstraints = false
         self.coverImage.snp.makeConstraints { (make) in
-            make.top.left.bottom.equalToSuperview().inset(self.coverImageEdgeInsets)
+            make.top.left.equalToSuperview().inset(self.coverImageEdgeInsets)
             make.size.equalTo(self.imageSize)
+            make.bottom.lessThanOrEqualToSuperview().inset(self.coverImageEdgeInsets.bottom)
         }
-          
+
         self.title.snp.makeConstraints { (make) in
             make.top.equalToSuperview().inset(self.titleEdgeInsets.top)
             make.left.equalTo(self.coverImage.snp.right).offset(self.titleEdgeInsets.left)
-            make.right.equalToSuperview().offset(self.titleEdgeInsets.right)
+            make.right.equalToSuperview().inset(self.titleEdgeInsets.right)
         }
 
         self.subtitle.snp.makeConstraints { (make) in
             make.top.equalTo(self.title.snp.bottom).offset(self.titleEdgeInsets.bottom)
             make.left.equalTo(self.coverImage.snp.right).offset(self.titleEdgeInsets.left)
-            make.right.equalToSuperview().offset(self.titleEdgeInsets.right)
+            make.right.equalToSuperview().inset(self.titleEdgeInsets.right)
         }
 
         self.categories.snp.makeConstraints { (make) in
             make.top.equalTo(self.subtitle.snp.bottom)
             make.left.equalTo(self.coverImage.snp.right).offset(self.titleEdgeInsets.left)
-            make.right.equalToSuperview().offset(self.titleEdgeInsets.right)
+            make.right.equalToSuperview().inset(self.titleEdgeInsets.right)
+            make.bottom.lessThanOrEqualToSuperview().inset(self.coverImageEdgeInsets.bottom)
         }
+
+    //    super.updateConstraints()
+    }
+
+    func setData(movie: MWMovie) {
+        self.title.text = movie.title
+        self.subtitle.text = movie.getSubtitle()
+        self.categories.text = movie.getCategoryString()
+        var image: UIImage?
+        if let imagedata = movie.image {
+            image = UIImage(data: imagedata)
+        } else {
+            image = UIImage(named: Constants.Images.defaultCard)
+        }
+        self.coverImage.image = image
+
+     //   self.setNeedsUpdateConstraints()
     }
 }

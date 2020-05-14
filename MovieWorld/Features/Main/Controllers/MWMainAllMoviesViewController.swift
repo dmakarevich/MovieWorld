@@ -11,65 +11,45 @@ import UIKit
 class MWMainAllMoviesViewController: MWViewController {
     // MARK: - Variables
     private let collecttionViewSectionInsets = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 0)
-    private var categoriesFilters: [MWCategory] = MWSys.sh.movieGenres ?? [MWCategory(id: 123, name: "Comedy"), MWCategory(id: 2546, name: "Drama")]
+    private var categoriesFilters: [MWCategory] = MWSys.sh.movieGenres ?? [MWCategory(id: 0, name: "None")]
     private var movies: [MWMovie]?
+    private var moviesInfo: MWResponseMovie?
     private var tableCellHieght: CGFloat = 125
     private var collectionViewHieght: CGFloat = 92
-    
+
     // MARK: - Gui variables
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
-        
+
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumLineSpacing = 8.0
         flowLayout.minimumInteritemSpacing = 10.0
         flowLayout.sectionInset = self.collecttionViewSectionInsets
-        
+
         return flowLayout
     }()
-    
+
     private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: self.flowLayout)
         cv.backgroundColor = .white
+        cv.delegate = self
+        cv.dataSource = self
         cv.register(MWFilterCategoriesCollectionViewCell.self,
                     forCellWithReuseIdentifier: MWFilterCategoriesCollectionViewCell.cellReuseIdentifier)
-        
+
         return cv
     } ()
-    
+
     private lazy var tableView: UITableView = {
         var tableView = UITableView()
-        tableView.allowsSelection = false
         tableView.separatorStyle = .none
+        tableView.delegate = self
+        tableView.dataSource = self
         tableView.register(MWMovieCardTableViewCell.self,
                            forCellReuseIdentifier: MWMovieCardTableViewCell.cellReuseIdentifier)
         return tableView
     } ()
-    
-    //MARK: - Data initializers methods
-    fileprivate func setupData() {
-        self.view.backgroundColor = .white
-        self.navigationItem.title = "Movies"
-        self.fetchMovies()
-        
-        self.view.addSubview(self.collectionView)
-        self.view.addSubview(self.tableView)
-    }
-    
-    func fetchMovies() {
-        let success: SuccessHandler = { (response: MWResponseMovie) in
-            let myMovies: [MWMovie] = response.results
-            
-            self.movies = myMovies
-            self.tableView.reloadData()
-        }
-        
-        MWNet.sh.request(URLPaths.nowPlayingMovies,
-                         ["language": URLLanquage.by.urlValue],
-                         of: MWResponseMovie.self,
-                         successHandler: success)
-    }
-    
+
     //MARK: - Constraints
     func makeConstraints() {
         self.collectionView.snp.makeConstraints { (make) in
@@ -77,41 +57,84 @@ class MWMainAllMoviesViewController: MWViewController {
             make.left.right.equalToSuperview()
             make.height.equalTo(self.collectionViewHieght)
         }
-        
+
         self.tableView.snp.makeConstraints { (make) in
             make.top.equalTo(self.collectionView.snp.bottom)
             make.bottom.left.right.equalToSuperview()
         }
     }
-    
+
     //MARK: - Lifecycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         self.setupData()
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        
-        self.collectionView.delegate = self
-        self.collectionView.dataSource = self
-        
-        self.makeConstraints()
-        
-        self.tableView.reloadData()
-        self.flowLayout.invalidateLayout()
-        self.collectionView.reloadData()
-        
+
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(updateCategories),
                                                name: Constants.NCNames.categories,
                                                object: nil)
     }
-    
+
+    //MARK: - Data initializers methods
+    fileprivate func setupData() {
+        self.view.backgroundColor = .white
+        self.navigationItem.title = "Movies"
+        self.fetchMovies()
+
+        self.view.addSubview(self.collectionView)
+        self.view.addSubview(self.tableView)
+
+        self.makeConstraints()
+    }
+
+    func fetchMovies(page: Int = 1) {
+        let success: SuccessHandler = { [unowned self] (response: MWResponseMovie) in
+            self.moviesInfo = response
+            debugPrint(response)
+            self.fetchImages(movies: response.results)
+        }
+        var params: [String: Any] = ["page": page]
+        params["language"] = URLLanguage.by.urlValue
+
+        MWNet.sh.request(urlPath: URLPaths.nowPlayingMovies,
+                         queryParameters: params,
+                         of: MWResponseMovie.self,
+                         successHandler: success)
+    }
+
+    func fetchImages(movies: [MWMovie]) {
+        let dispatch = DispatchGroup()
+        movies.forEach ({ (movie) in
+            let completion: CompetionImageHandler = { (data) in
+                movie.image = data
+                dispatch.leave()
+            }
+
+            dispatch.enter()
+            MWNet.sh.getImage(imagePath: movie.poster,
+                              size: .w185,
+                              handler: completion)
+        })
+
+        dispatch.notify(queue: .main) {
+            if let info = self.moviesInfo, info.page > 1 {
+                movies.forEach({(movie) in
+                    self.movies?.append(movie)
+                })
+            } else {
+                self.movies = movies
+            }
+            self.tableView.reloadData()
+            self.tableView.setNeedsUpdateConstraints()
+        }
+    }
+
     //MARK: - Action Selectors
     @objc
     func updateCategories() {
         self.categoriesFilters = MWSys.sh.movieGenres ?? [MWCategory(id: 0, name: "None")]
+        self.flowLayout.invalidateLayout()
         self.collectionView.reloadData()
     }
 }
@@ -121,14 +144,12 @@ extension MWMainAllMoviesViewController: UICollectionViewDelegate, UICollectionV
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.categoriesFilters.count
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MWFilterCategoriesCollectionViewCell.cellReuseIdentifier,
-                                                            for: indexPath) as? MWFilterCategoriesCollectionViewCell else {
-                                                                return MWFilterCategoriesCollectionViewCell()
-        }
-        cell.filterLabel.text = self.categoriesFilters[indexPath.row].name
-        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MWFilterCategoriesCollectionViewCell.cellReuseIdentifier,
+                                                      for: indexPath)
+        (cell as? MWFilterCategoriesCollectionViewCell)?.set(filter: self.categoriesFilters[indexPath.row].name)
+
         return cell
     }
 }
@@ -137,17 +158,17 @@ extension MWMainAllMoviesViewController: UICollectionViewDelegate, UICollectionV
 extension MWMainAllMoviesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var cellSize = CGSize()
-        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MWFilterCategoriesCollectionViewCell.cellReuseIdentifier,
-                                                         for: indexPath) as? MWFilterCategoriesCollectionViewCell {
+        if collectionView.dequeueReusableCell(withReuseIdentifier: MWFilterCategoriesCollectionViewCell.cellReuseIdentifier,
+                                              for: indexPath) is MWFilterCategoriesCollectionViewCell {
             let count = self.categoriesFilters.count
             if count > indexPath.row {
                 let category = self.categoriesFilters[indexPath.row].name
-                let fontAttributes = [NSAttributedString.Key.font: cell.filterLabel.font]
+                let fontAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13)]
                 let width = category.size(withAttributes: fontAttributes).width
                 cellSize = CGSize(width: width + 24, height: 26)
             }
         }
-        
+
         return cellSize
     }
 }
@@ -157,28 +178,38 @@ extension MWMainAllMoviesViewController: UITableViewDelegate, UITableViewDataSou
     func numberOfSections(in tableView: UITableView) -> Int {
         return  1
     }
-    
+
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int {
         return self.movies?.count ?? 0
     }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return self.tableCellHieght
-    }
-    
+
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: MWMovieCardTableViewCell.cellReuseIdentifier,
-                                                       for: indexPath) as? MWMovieCardTableViewCell else {
-                                                        return MWMovieCardTableViewCell()
-        }
-        if let movie = movies?[indexPath.row] {
-            cell.cellContentView.title.text = movie.title
-            cell.cellContentView.subtitle.text = String.init(movie.getReleaseYear()) + Constants.commaDelimiter + movie.originalLanguage
-            cell.cellContentView.categories.text = movie.getCategoryString()
-        }
-        
+        let cell = tableView.dequeueReusableCell(withIdentifier: MWMovieCardTableViewCell.cellReuseIdentifier,
+                                                 for: indexPath)
+        (cell as? MWMovieCardTableViewCell)?.set(movie: movies?[indexPath.row])
+
         return cell
+    }
+
+    func tableView(_ tableView: UITableView,
+                   willDisplay cell: UITableViewCell,
+                   forRowAt indexPath: IndexPath) {
+        if let movies = self.movies, indexPath.row == movies.count - 3 {
+            if let moviesInfo = self.moviesInfo, moviesInfo.hasNextPage() {
+                self.fetchMovies(page: moviesInfo.page + 1)
+            }
+        }
+    }
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let movie = self.movies?[indexPath.row] {
+            let moviesInSection = MWDetailMovieViewController()
+            moviesInSection.view.backgroundColor = .white
+            moviesInSection.getMovie(movieId: movie.id)
+
+            MWI.sh.push(vc: moviesInSection)
+        }
     }
 }

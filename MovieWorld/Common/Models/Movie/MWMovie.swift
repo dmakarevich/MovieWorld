@@ -8,9 +8,7 @@
 
 import Foundation
 
-
 class MWMovie: Codable {
-
     enum CodingKeys: String, CodingKey {
         case id
         case title
@@ -23,7 +21,7 @@ class MWMovie: Codable {
         case poster = "poster_path"
         case backdropPath = "backdrop_path"
     }
-    
+
     let id: Int
     let title: String
     let originalTitle: String
@@ -34,10 +32,11 @@ class MWMovie: Codable {
     let adult: Bool
     let poster: String
     let backdropPath: String
-    
+    var image: Data? = nil
+
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-            
+
         self.id = (try? container.decode(Int.self, forKey: .id)) ?? 0
         self.title = (try? container.decode(String.self, forKey: .title)) ?? Constants.emptyString
         self.originalTitle = (try? container.decode(String.self, forKey: .originalTitle)) ?? Constants.emptyString
@@ -66,30 +65,53 @@ class MWMovie: Codable {
         try container.encode(self.backdropPath, forKey: .backdropPath)
     }
 
-    //MARK: - get category names as string
-    func getCategoryString() -> String {
-        var result: String = Constants.emptyString
-        if let categories: [MWCategory] = MWSys.sh.movieGenres {
-            if categories.count > 0 {
-                let firstGenre = self.categoryIds[0]
-                self.categoryIds.forEach({ (genre) in
-                    if firstGenre != genre {
-                        result += Constants.commaDelimiter
-                    }
-                    categories.forEach({ (c) in
-                        if (c.id == genre) {
-                            result += c.name
-                        }
-                    })
-                })
-            }
+    //MARK: - Methods for prepare info to display
+    func getSubtitle() -> String {
+        var result = ""
+        if let year = self.getReleaseYear() {
+            result += year + Constants.commaDelimiter
         }
-        
+        result += self.getFirstCategory()
+
         return result
     }
-    
-    func getReleaseYear() -> String {
-        return String.init(Calendar.current.dateComponents([.year], from: self.releaseDate).year ?? 1888)
+
+    func getCategoryString() -> String {
+        var result: String = Constants.emptyString
+        if let categories = MWSys.sh.movieGenres, categories.count > 0 {
+            self.categoryIds.forEach({ (id) in
+                categories.forEach({ (category) in
+                    if category.id == id {
+                        result += self.categoryIds.first != id ? Constants.commaDelimiter : ""
+                        result += category.name
+                    }
+                })
+            })
+        }
+
+        return result
     }
 
+    func getReleaseYear() -> String? {
+        var result: String?
+        if let year = Calendar.current.dateComponents([.year], from: self.releaseDate).year {
+            result = String(year)
+        }
+
+        return result
+    }
+
+    func getFirstCategory() -> String {
+        var result: String = ""
+        let categories = MWSys.sh.movieGenres
+        if let categories = categories, categories.count > 0 {
+            categories.forEach ({ (category) in
+                if self.categoryIds.first == category.id {
+                    result = category.name
+                }
+            })
+        }
+
+        return result
+    }
 }

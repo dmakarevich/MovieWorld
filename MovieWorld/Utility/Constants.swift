@@ -11,34 +11,39 @@ import UIKit
 struct Constants {
     static let emptyString: String = ""
     static let commaDelimiter: String = ", "
-    
+    static let buttonCornerRadius: CGFloat = 5
+
     struct NCNames {
         static let categories = Notification.Name("GenresMovie")
     }
-    
+
     struct MainTableHeader {
         static let reuseIdentifier: String = "MWMainTableHeader"
         static let allButton: String = "All →"
         static let nameCategory: String = "Header"
     }
-    
+
     struct Colors {
         static let accentColor: String = "accentColor"
         static let textColor: String = "textColor"
     }
-    
+
+    struct Images {
+        static let defaultCard: String = "defaultCard"
+    }
+
     struct FontSize {
         static let size13: CGFloat = 13
         static let size17: CGFloat = 17
         static let size24: CGFloat = 24
     }
-    
+
     struct BarIcon {
         static let main: String = "mainBarIcon"
         static let category: String = "categoryBarIcon"
         static let search: String = "searchBarIcon"
     }
-    
+
     struct BarTitle {
         static let main: String = "Main"
         static let category: String = "Category"

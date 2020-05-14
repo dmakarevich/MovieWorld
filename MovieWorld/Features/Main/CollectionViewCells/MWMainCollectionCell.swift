@@ -8,82 +8,89 @@
 
 import UIKit
 
-class MWMainCollectionCell: UICollectionViewCell {    
+class MWMainCollectionCell: UICollectionViewCell {
     //MARK: - Variables
-    static var cellReuseIdentifier: String {
-        return "MainCardCell"
-    }
-    
+    static var cellReuseIdentifier: String = "MWMainCollectionCell"
+
     var movieId: Int?
-    
+
     private let imageSize = CGSize(width: 130, height: 185)
     private let coverImageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 12, right: 0)
     private let titleEdgeInsets = UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0)
-    
+
     //MARK: - Gui variables
-    var coverImage: UIImageView = {
+    private var coverImage: UIImageView = {
         let iv = UIImageView()
         iv.cornerRadius = 5
-        iv.image = UIImage(named: "defaultCard")
-        
+        iv.image = UIImage(named: Constants.Images.defaultCard)
+
         return iv
     }()
-    
-    var title: UILabel = {
+
+    private var title: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: Constants.FontSize.size17, weight: .bold)
-        label.textColor = .black
-        label.text = "21 Bridges"
-        
+        label.textColor = UIColor.init(named: Constants.Colors.textColor)
+        label.text = "Title"
+
         return label
     }()
-    
-    var subtitle: UILabel = {
+
+    private var subtitle: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: Constants.FontSize.size13)
         label.textColor = .black
-        label.text = "2019, Drama"
-        
+        label.text = "Year, Category"
+
         return label
     }()
-    
+
     //MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        self.addSubview(self.coverImage)
-        self.addSubview(self.title)
-        self.addSubview(self.subtitle)
-        
-        self.makeConstraints()
+
+        self.contentView.addSubview(self.coverImage)
+        self.contentView.addSubview(self.title)
+        self.contentView.addSubview(self.subtitle)
+
+        self.updateConstraints()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     //MARK: - Constraints
-    func makeConstraints() {
-        self.snp.updateConstraints { (make) in
-            make.width.equalTo(self.imageSize.width)
-        }
-        
-        self.coverImage.snp.makeConstraints { (make) in
-            make.top.left.equalTo(self.contentView)
-                .inset(self.coverImageEdgeInsets)
+    override func updateConstraints() {
+        self.coverImage.snp.updateConstraints { (make) in
+            make.top.left.right.equalToSuperview().inset(self.coverImageEdgeInsets)
             make.size.equalTo(self.imageSize)
         }
-        
+
         self.title.snp.makeConstraints { (make) in
             make.top.equalTo(self.coverImage.snp.bottom)
                 .offset(self.titleEdgeInsets.top)
-            make.left.equalToSuperview()
+            make.left.right.equalToSuperview()
                 .offset(self.titleEdgeInsets.left)
         }
-        
+
         self.subtitle.snp.makeConstraints { (make) in
-            make.top.equalTo(self.title.snp.bottom).inset(0)
-            make.left.equalToSuperview().offset(0)
+            make.top.equalTo(self.title.snp.bottom)
+            make.left.right.equalToSuperview()
+            make.bottom.lessThanOrEqualToSuperview().offset(5)
         }
+
+        super.updateConstraints()
+    }
+
+    func set(movie: MWMovie) {
+        if let data = movie.image, let image = UIImage(data: data) {
+            self.coverImage.image = image
+        }
+        self.title.text = movie.title
+        self.subtitle.text = movie.getSubtitle()
+        self.movieId = movie.id
+
+        self.setNeedsUpdateConstraints()
     }
 }

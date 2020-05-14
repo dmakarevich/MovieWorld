@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum Sizes: String, Codable {    
+enum Sizes: String, Codable {
     case w45
     case w92
     case w154
@@ -32,7 +32,7 @@ struct MWConfiguration: Codable {
         case profileSizes = "profile_sizes"
         case stillSizes = "still_sizes"
     }
-    
+
     var imageUrl: String
     var secureImageUrl: String
     var backdropSizes: [Sizes]
@@ -40,7 +40,7 @@ struct MWConfiguration: Codable {
     var posterSizes: [Sizes]
     var profileSizes: [Sizes]
     var stillSizes: [Sizes]
-    
+//FIXME: - delete debug code
 //    func encode(to encoder: Encoder) throws {
 //        var container = encoder.container(keyedBy: CodingKeys.self)
 //

@@ -8,10 +8,9 @@
 
 import Foundation
 
-
 struct MWResponseConfiguration: Codable {
     let images: MWConfiguration
-    
+
     enum CodingKeys: String, CodingKey {
       case images
     }

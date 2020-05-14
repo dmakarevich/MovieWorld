@@ -8,10 +8,9 @@
 
 import Foundation
 
-
 struct MWResponseCategory: Codable {
     let genres: [MWCategory]
-    
+
     enum CodingKeys: String, CodingKey {
       case genres
     }
