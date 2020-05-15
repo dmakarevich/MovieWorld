@@ -15,6 +15,7 @@ class MWDetailMovie: MWMovie {
         case productionCountries = "production_countries"
         case imdbId = "imdb_id"
         case status
+        case runtime
     }
 
     //MARK: - Variables
@@ -22,6 +23,7 @@ class MWDetailMovie: MWMovie {
     let productionCountries: [MWCountry]
     let status: String
     let imdbId: String
+    let runtime: Int
 
     //MARK: - Initialization
     required init(from decoder: Decoder) throws {
@@ -31,6 +33,7 @@ class MWDetailMovie: MWMovie {
         self.productionCountries = (try? container.decode([MWCountry].self, forKey: .productionCountries)) ?? []
         self.status = (try? container.decode(String.self, forKey: .status)) ?? ""
         self.imdbId = (try? container.decode(String.self, forKey: .imdbId)) ?? ""
+        self.runtime = (try? container.decode(Int.self, forKey: .runtime)) ?? 0
 
         try super.init(from: decoder)
     }
@@ -42,6 +45,7 @@ class MWDetailMovie: MWMovie {
         try container.encode(self.productionCountries, forKey: .productionCountries)
         try container.encode(self.status, forKey: .status)
         try container.encode(self.imdbId, forKey: .imdbId)
+        try container.encode(self.runtime, forKey: .runtime)
 
         try super.encode(to: encoder)
     }
@@ -74,5 +78,10 @@ class MWDetailMovie: MWMovie {
         result += self.getProductionCountriesString()
 
         return result
+    }
+
+    func getRuntime() -> String {
+        print(self.runtime)
+        return "  " + String(self.runtime) + Constants.runtime
     }
 }

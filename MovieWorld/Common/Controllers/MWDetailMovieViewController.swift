@@ -13,6 +13,7 @@ class MWDetailMovieViewController: MWViewController {
     private var detailMovie: MWDetailMovie?
     private var movieCard = MWMovieCardView()
     private var descriptionBlock = MWDescriptionView()
+    private var movieCrewHeader = MWHeaderView()
 
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -20,6 +21,7 @@ class MWDetailMovieViewController: MWViewController {
     }()
     private let movieCardEdges = UIEdgeInsets(top: 16, left: 0, bottom: 12, right: 0)
     private let descriptionBlockEdges = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+    private let movieCrewHeaderEdges = UIEdgeInsets(top: 24, left: 16, bottom: 12, right: 26)
 
     private let contentView = UIView()
 
@@ -42,6 +44,11 @@ class MWDetailMovieViewController: MWViewController {
         self.descriptionBlock.snp.makeConstraints({ (make) in
             make.top.equalTo(self.movieCard.snp.bottom)
             make.left.right.equalTo(self.contentView)
+        })
+
+        self.movieCrewHeader.snp.makeConstraints({ (make) in
+            make.top.equalTo(self.descriptionBlock.snp.bottom)
+            make.left.right.equalTo(self.contentView).inset(self.movieCrewHeaderEdges)
             make.bottom.lessThanOrEqualTo(self.contentView.snp.bottom).inset(self.descriptionBlockEdges.bottom)
         })
     }
@@ -57,12 +64,14 @@ class MWDetailMovieViewController: MWViewController {
         self.scrollView.addSubview(self.contentView)
         self.contentView.addSubview(self.movieCard)
         self.contentView.addSubview(self.descriptionBlock)
+        self.contentView.addSubview(self.movieCrewHeader)
+        self.movieCrewHeader.set(title: "Cast")
     }
 
     func setData() {
         if let movie = self.detailMovie {
             self.movieCard.setData(movie: movie)
-            self.descriptionBlock.setData(description: movie.description)
+            self.descriptionBlock.setData(description: movie.description, runtime: movie.getRuntime(), isAdult: movie.adult)
         }
 
         self.makeConstraints()

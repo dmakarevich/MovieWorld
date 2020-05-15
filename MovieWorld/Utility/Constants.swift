@@ -12,6 +12,7 @@ struct Constants {
     static let emptyString: String = ""
     static let commaDelimiter: String = ", "
     static let buttonCornerRadius: CGFloat = 5
+    static let runtime: String = " минут"
 
     struct NCNames {
         static let categories = Notification.Name("GenresMovie")
