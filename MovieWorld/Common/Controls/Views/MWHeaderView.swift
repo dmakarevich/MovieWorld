@@ -10,43 +10,37 @@ import UIKit
 
 class MWHeaderView: UIView {
     // MARK: - Variables
-    private let allLabelSize = CGSize(width: 52, height: 24)
-    private let viewInsets = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 7)
+    private let viewInsets = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
 
     private lazy var titleLabel: UILabel = {
         var label = UILabel()
-        label.font = .systemFont(ofSize: Constants.FontSize.size24, weight: .bold)
+        label.font = .systemFont(ofSize: Constants.FontSize.size24,
+                                 weight: .bold)
         label.textColor = UIColor(named: Constants.Colors.textColor)
         label.text = Constants.MainTableHeader.nameCategory
 
         return label
     } ()
 
-    private lazy var allLabel: UILabel = {
-        var label = UILabel()
-        label.text = Constants.MainTableHeader.allButton
-        label.font = .systemFont(ofSize: Constants.FontSize.size13)
-        label.textColor = .white
-        label.backgroundColor = UIColor(named: Constants.Colors.accentColor)
-        label.cornerRadius = Constants.buttonCornerRadius
-        label.textAlignment = .center
+    private lazy var allView: MWAllView = {
+        var view = MWAllView()
+        view.backgroundColor = UIColor(named: Constants.Colors.accentColor)
+        view.cornerRadius = Constants.buttonCornerRadius
 
-        return label
+        return view
     } ()
 
     // MARK: - Add Constraints
-    override func updateConstraints() {
-        self.titleLabel.snp.updateConstraints { (make) in
+    func makeConstraints() {
+        self.translatesAutoresizingMaskIntoConstraints = false
+        self.titleLabel.snp.makeConstraints { (make) in
             make.top.left.bottom.equalToSuperview().inset(self.viewInsets)
         }
 
-        self.allLabel.snp.makeConstraints{ (make) in
-            make.size.equalTo(self.allLabelSize)
+        self.allView.snp.makeConstraints{ (make) in
             make.right.equalToSuperview().inset(self.viewInsets.right)
-            make.center.equalTo(self.titleLabel.snp.center)
+            make.centerY.equalTo(self.titleLabel.snp.centerY)
         }
-
-        super.updateConstraints()
     }
 
     // MARK: - Initialization
@@ -55,8 +49,8 @@ class MWHeaderView: UIView {
 
         self.backgroundColor = .white
         self.addSubview(self.titleLabel)
-        self.addSubview(self.allLabel)
-        self.updateConstraints()
+        self.addSubview(self.allView)
+        self.makeConstraints()
     }
 
     required init?(coder: NSCoder) {
@@ -65,6 +59,5 @@ class MWHeaderView: UIView {
 
     func set(title: String) {
         self.titleLabel.text = title
-        self.setNeedsUpdateConstraints()
     }
 }

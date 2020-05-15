@@ -81,8 +81,8 @@ class MWDescriptionView: UIView {
         }
     }
 
-    func setData(description: String, isAdult: Bool = false) {
+    func setData(description: String, runtime: String?, isAdult: Bool = false) {
         self.descriptionLabel.text = description
-        self.subtitleLabel.text = "HD  16+"
+        self.subtitleLabel.text = "HD" + (isAdult ? "  18+" : "") + (runtime ?? "")
     }
 }
