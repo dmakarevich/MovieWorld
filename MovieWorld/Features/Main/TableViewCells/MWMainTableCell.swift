@@ -68,7 +68,7 @@ class MWMainTableCell: UITableViewCell {
 //MARK: - Collection view Datasource and Delegate Methods
 extension MWMainTableCell: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return movies?.count ?? 1
+        return self.movies?.count ?? 1
     }
 
     func collectionView(_ collectionView: UICollectionView,

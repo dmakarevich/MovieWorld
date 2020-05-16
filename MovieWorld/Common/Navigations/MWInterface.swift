@@ -19,10 +19,10 @@ class MWInterface {
     func setup(window: UIWindow) {
         self.window = window
         self.setUpNavigationBarStyle()
+        MWSys.sh.setup()
 
         window.rootViewController = self.tabBarController
         window.makeKeyAndVisible()
-        MWSys.sh.setup()
     }
 
     private init() {}

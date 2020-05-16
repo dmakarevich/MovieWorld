@@ -9,11 +9,6 @@
 import UIKit
 
 class MWMainTabBarController: UITabBarController {
-    //MARK: - Variables
-    let mainVC = MWMainViewController()
-    let categoryVC = MWCategoryController()
-    let searchVC = MWSearchController()
-
     //MARK: - Initialization
     private func setTabBarAppearence() {
         self.tabBar.barTintColor = .white
@@ -22,15 +17,30 @@ class MWMainTabBarController: UITabBarController {
 
     //MARK: - View life cycle
     override func viewDidLoad() {
-        self.mainVC.setup(title: Constants.BarTitle.main, imageName: Constants.BarIcon.main)
-        self.categoryVC.setup(title: Constants.BarTitle.category, imageName: Constants.BarIcon.category)
-        self.searchVC.setup(title: Constants.BarTitle.search, imageName: Constants.BarIcon.search)
+        let mainVC = MWMainViewController()
+        mainVC.setup(title: Constants.BarTitle.main,
+                     imageName: Constants.BarIcon.main)
+        let categoryVC = MWCategoryController()
+        categoryVC.setup(title: Constants.BarTitle.category,
+                         imageName: Constants.BarIcon.category)
+        let searchVC = MWSearchController()
+        searchVC.setup(title: Constants.BarTitle.search,
+                       imageName: Constants.BarIcon.search)
 
-        let tabBarList = [self.mainVC.createNavigationVC(),
-                          self.categoryVC.createNavigationVC(),
-                          self.searchVC.createNavigationVC()]
+        let tabBarList = [mainVC,
+                          categoryVC,
+                          searchVC]
 
         self.viewControllers = tabBarList
+            .map { self.createNavigationVC(viewController: $0) }
         self.setTabBarAppearence()
+    }
+
+    func createNavigationVC(viewController vc: MWViewController) -> UINavigationController {
+        let recentVC = UINavigationController(rootViewController: vc)
+        recentVC.tabBarItem.title = vc.title
+        recentVC.tabBarItem.image = UIImage(named: vc.barImage)
+
+        return recentVC
     }
 }

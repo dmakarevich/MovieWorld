@@ -14,12 +14,13 @@ class MWMainTableHeader: UITableViewHeaderFooterView {
         return "MWMainTableHeader"
     }
 
+    private let headerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 7)
     private var headerView = MWHeaderView()
 
     // MARK: - Add Constraints
     override func updateConstraints() {
         self.headerView.snp.updateConstraints { (make) in
-            make.edges.equalToSuperview()
+            make.edges.equalToSuperview().inset(self.headerInset)
         }
 
         super.updateConstraints()
@@ -29,7 +30,7 @@ class MWMainTableHeader: UITableViewHeaderFooterView {
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         self.translatesAutoresizingMaskIntoConstraints = false
-
+        self.contentView.backgroundColor = .white
         self.contentView.addSubview(self.headerView)
         self.updateConstraints()
     }

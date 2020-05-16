@@ -16,13 +16,17 @@ class MWSystem {
     private(set) var configuration: MWConfiguration?
     private(set) var movieGenres: [MWCategory]? {
         didSet {
-            NotificationCenter.default.post(name: Constants.NCNames.categories,
-                                            object: nil)
+            NotificationCenter
+                .default
+                .post(name: Constants.NCNames.categories,
+                      object: nil)
         }
         willSet {
-            NotificationCenter.default.removeObserver(self,
-                                                      name: Constants.NCNames.categories,
-                                                      object: nil)
+            NotificationCenter
+                .default
+                .removeObserver(self,
+                                name: Constants.NCNames.categories,
+                                object: nil)
         }
     }
 
@@ -33,26 +37,35 @@ class MWSystem {
         self.fetchCategories()
     }
 
-    func fetchConfiguration() {
+    private func fetchConfiguration() {
         let succcess: SuccessHandler = { (response: MWResponseConfiguration) in
             MWSys.sh.configuration = response.images
             debugPrint("~~ fetchConfiguration Compete!!")
         }
 
-        let url = "/configuration"
-        MWNet.sh.request(urlPath: url, of: MWResponseConfiguration.self, successHandler: succcess)
+        let errors = { (error: MWNetError) in
+            print(error)
+        }
+
+        MWNet.sh.requestAlamofire(url: URLPaths.confiurations,
+                                  successHandler: succcess,
+                                  errorHandler: errors)
     }
 
-    func fetchCategories() {
+    private func fetchCategories() {
         let success: SuccessHandler = { (categoryResponse: MWResponseCategory) in
             let categories: [MWCategory] = categoryResponse.genres
 
             MWSystem.sh.movieGenres = categories
         }
 
-        MWNet.sh.request(urlPath: URLPaths.genreList,
-                         queryParameters: ["language": URLLanguage.by.urlValue],
-                         of: MWResponseCategory.self,
-                         successHandler: success)
+        let errors = { (error: MWNetError) in
+            print(error)
+        }
+
+        MWNet.sh.requestAlamofire(url: URLPaths.genreList,
+                         parameters: ["language": URLLanguage.by.urlValue],
+                         successHandler: success,
+                         errorHandler: errors)
     }
 }
