@@ -20,7 +20,6 @@ class MWMainAllMoviesViewController: MWViewController {
     // MARK: - Gui variables
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
-
         flowLayout.scrollDirection = .horizontal
         flowLayout.minimumLineSpacing = 8.0
         flowLayout.minimumInteritemSpacing = 10.0
@@ -94,13 +93,18 @@ class MWMainAllMoviesViewController: MWViewController {
             debugPrint(response)
             self.fetchImages(movies: response.results)
         }
-        var params: [String: Any] = ["page": page]
+
+        let errors = { (error: MWNetError) in
+            print(error)
+        }
+
+        var params: [String: String] = ["page": String(page)]
         params["language"] = URLLanguage.by.urlValue
 
-        MWNet.sh.request(urlPath: URLPaths.nowPlayingMovies,
-                         queryParameters: params,
-                         of: MWResponseMovie.self,
-                         successHandler: success)
+        MWNet.sh.requestAlamofire(url: URLPaths.nowPlayingMovies,
+                         parameters: params,
+                         successHandler: success,
+                         errorHandler: errors)
     }
 
     func fetchImages(movies: [MWMovie]) {
@@ -112,7 +116,7 @@ class MWMainAllMoviesViewController: MWViewController {
             }
 
             dispatch.enter()
-            MWNet.sh.getImage(imagePath: movie.poster,
+            MWNet.sh.requestImage(imagePath: movie.poster,
                               size: .w185,
                               handler: completion)
         })

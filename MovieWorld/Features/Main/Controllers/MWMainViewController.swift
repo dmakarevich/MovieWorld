@@ -49,10 +49,19 @@ class MWMainViewController: MWViewController {
             self.fetchImages(movies: movies)
         }
 
-        MWNet.sh.request(urlPath: URLPaths.popularMovies,
-                         queryParameters: ["language": URLLanguage.by.urlValue],
-                         of: MWResponseMovie.self,
-                         successHandler: success)
+        let errors = { (error: MWNetError) in
+            switch error {
+            case .incorrectUrl(url: "123"):
+                print("incorrect url")
+            default:
+                print("ERROR")
+            }
+        }
+
+        MWNet.sh.requestAlamofire(url: URLPaths.popularMovies,
+                                  parameters: ["language": URLLanguage.by.urlValue],
+                                  successHandler: success,
+                                  errorHandler: errors)
     }
 
     func fetchImages(movies: [MWMovie]) {
@@ -64,7 +73,7 @@ class MWMainViewController: MWViewController {
             }
 
             dispatch.enter()
-            MWNet.sh.getImage(imagePath: movie.poster,
+            MWNet.sh.requestImage(imagePath: movie.poster,
                               size: .w185,
                               handler: completion)
         })
@@ -75,7 +84,7 @@ class MWMainViewController: MWViewController {
         }
     }
 
-    //MARK: - Data initlisers methods
+    //MARK: - Add constraints
     func makeContraints() {
         self.tableView.snp.makeConstraints { (make) in
             make.top.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(self.tableViewInsets)

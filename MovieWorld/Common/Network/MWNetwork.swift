@@ -5,15 +5,6 @@
 //  Created by Admin on 02.04.2020.
 //  Copyright © 2020 Admin. All rights reserved.
 //
-//2. В синглтоне создать фукнцию request, которая принимает в виде аргументов: url path, query parameters,
-// successHandler, errorHandler.
-//successHandler - замыкание, возвращающее модель типа Decodable. Использовать дженерик для того, чтобы
-// передавать в request конкретный тип возвращаемого значения
-//errorHandler - замыкание, возвращающее ошибку (в виде структуры / перечисления).
-//Ошибка в себе может хранить statusCode, message, description.
-//Обработать следующие statusCodes: 200…300, 401, 404. Для 401 и 404 сделать модельку Decodable
-//3. На главной экране реализовать 3-4 понравившихся запроса из api:
-//https://developers.themoviedb.org/3/getting-started/introduction . Какие именно запросы на получение фильмов - выбирайте сами. Но сделать не менее 4 блоков на главноым экране.
 
 import Foundation
 import Alamofire
@@ -22,6 +13,7 @@ typealias MWNet = MWNetwork
 typealias SuccessHandler<T: Decodable> = (T) -> Void
 typealias ErrorHandler = (Int, AFError) -> Void
 typealias CompetionImageHandler = (Data?) -> Void
+typealias CompletionHandler = (Result<MWResponseConfiguration, MWNetError>) -> Void
 
 class MWNetwork {
     static let sh = MWNetwork()
@@ -29,6 +21,7 @@ class MWNetwork {
     private let apiKey: String = "79d5894567be5b76ab7434fc12879584"
     private let baseURL: String = "https://api.themoviedb.org/3"
     private let imageURL: String = "https://image.tmdb.org/t/p/"
+    private let parameters: [String: String] = ["api_key": "79d5894567be5b76ab7434fc12879584"]
 
     private let errorHandler: ErrorHandler = { (errorCode, errors) in
         print("~~Errors~~")
@@ -42,108 +35,59 @@ class MWNetwork {
         }
     }
 
-    func fetchConfiguration() {
-        let url = baseURL + "/configuration?api_key=" + apiKey
+    func requestAlamofire<T: Decodable>(url: String,
+                                        parameters: [String: String]? = nil,
+                                        successHandler: @escaping (T) -> Void,
+                                        errorHandler: @escaping (MWNetError) -> Void) {
+        let fullPath = self.baseURL + url
 
-        AF.request(url)
-            .validate()
-            .responseDecodable(of: MWResponseConfiguration.self) { (response) in
-                switch response.result {
-                case .failure(let requestErrors):
-                    guard let errorCode = response.response?.statusCode else { return }
-                    self.errorHandler(errorCode, requestErrors)
-                case .success(let data):
-                    debugPrint(data.images)
-                }
-        }
-    }
-
-    func request<T: Decodable>(urlPath: String,
-                               queryParameters: [String: Any] = ["language": URLLanguage.by.urlValue],
-                               of: T.Type?,
-                               successHandler: @escaping SuccessHandler<T>,
-                               errorHandler: ErrorHandler? = nil) -> Void {
-        let url = baseURL + urlPath
-        var params: [String: Any] = queryParameters
-        params["api_key"] = self.apiKey
-
-        AF.request(url, parameters: params)
-            .validate()
-            .responseDecodable(of: T.self) { (response) in
-            switch response.result {
-            case .failure(let requestErrors):
-                guard let errorCode = response.response?.statusCode else { return }
-                if let errors = errorHandler {
-                    errors(errorCode, requestErrors)
-                } else {
-                    self.errorHandler(errorCode, requestErrors)
-                }
-            case .success(let data):
-                successHandler(data)
+        var urlParameters = self.parameters
+        if let parameters = parameters {
+            for paramater in parameters {
+                urlParameters[paramater.key] = paramater.value
             }
         }
+
+        AF
+            .request(fullPath, parameters: urlParameters)
+            .responseJSON { (response) in
+                if let error = response.error {
+                    errorHandler(.networkError(error: error))
+                    return
+                } else if let data = response.data,
+                    let httpResponse = response.response {
+                    switch httpResponse.statusCode {
+                    case 200...300:
+                        do {
+                            let model = try JSONDecoder().decode(T.self, from: data)
+                            successHandler(model)
+                        } catch let error {
+                            errorHandler(.parsingError(error: error))
+                        }
+                    case 401, 404:
+                        // TODO: - write error response model handling
+                        break
+                    default:
+                        errorHandler(.serverError(statusCode: httpResponse.statusCode))
+                    }
+                } else {
+                    errorHandler(.unknown)
+                }
+        }
     }
 
-    func getImage(imagePath path: String,
-                  size: Sizes = .original,
-                  handler: @escaping CompetionImageHandler) {
+    func requestImage(imagePath path: String,
+                      size: Sizes = .original,
+                      handler: @escaping CompetionImageHandler) {
         let base: String = MWSys.sh.configuration?.secureImageUrl ?? imageURL
         let url = base + size.rawValue + path
 
         AF.request(url)
             .validate()
             .responseData { (response) in
-                debugPrint(response.request?.urlRequest)
                 if response.error == nil {
                     handler(response.data)
-                } else {
-                    debugPrint(response.error)
                 }
-        }
-    }
-}
-
-enum MWNetError {
-    case incorrectUrl(url: String)
-    case networkError(error: Error)
-    case serverError(statusCode: Int)
-    case parsingError(error: Error)
-
-    case unknown
-}
-
-struct URLPaths {
-    static let popularMovies: String =  "/movie/popular"
-    static let topMovies: String =  "/movie/top_rated"
-    static let nowPlayingMovies: String = "/movie/now_playing"
-    static let genreList: String = "/genre/movie/list"
-    static let movieById: String = "/movie/"
-}
-
-enum URLPath {
-    case popularMovies
-    case topMovies
-    case nowPlayingMovies
-
-    var urlValue: String {
-        switch self {
-        case .popularMovies:
-            return "/movie/popular"
-        case .topMovies:
-            return "/movie/top_rated"
-        case .nowPlayingMovies:
-            return "/movie/now_playing"
-        }
-    }
-
-    var getTitle: String {
-        switch self {
-        case .popularMovies:
-            return "Popular Movies"
-        case .topMovies:
-            return "Top movies"
-        case .nowPlayingMovies:
-            return "Now Playing"
         }
     }
 }
