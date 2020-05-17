@@ -13,6 +13,7 @@ enum MWNetError: Error {
     case networkError(error: Error)
     case serverError(statusCode: Int)
     case parsingError(error: Error)
+    case responseError(error: MWResponseError)
 
     case unknown
 }

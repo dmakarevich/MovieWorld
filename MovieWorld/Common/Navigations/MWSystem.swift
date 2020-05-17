@@ -12,6 +12,7 @@ typealias MWSys = MWSystem
 
 class MWSystem {
     static let sh = MWSystem()
+    static var language: URLLanguage = .en
 
     private(set) var configuration: MWConfiguration?
     private(set) var movieGenres: [MWCategory]? {
@@ -40,7 +41,6 @@ class MWSystem {
     private func fetchConfiguration() {
         let succcess: SuccessHandler = { (response: MWResponseConfiguration) in
             MWSys.sh.configuration = response.images
-            debugPrint("~~ fetchConfiguration Compete!!")
         }
 
         let errors = { (error: MWNetError) in
@@ -64,8 +64,7 @@ class MWSystem {
         }
 
         MWNet.sh.requestAlamofire(url: URLPaths.genreList,
-                         parameters: ["language": URLLanguage.by.urlValue],
-                         successHandler: success,
-                         errorHandler: errors)
+                                  successHandler: success,
+                                  errorHandler: errors)
     }
 }

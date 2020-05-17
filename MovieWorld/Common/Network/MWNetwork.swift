@@ -11,9 +11,8 @@ import Alamofire
 
 typealias MWNet = MWNetwork
 typealias SuccessHandler<T: Decodable> = (T) -> Void
-typealias ErrorHandler = (Int, AFError) -> Void
+typealias ErrorHandler = (Int?, AFError?) -> Void
 typealias CompetionImageHandler = (Data?) -> Void
-typealias CompletionHandler = (Result<MWResponseConfiguration, MWNetError>) -> Void
 
 class MWNetwork {
     static let sh = MWNetwork()
@@ -21,7 +20,7 @@ class MWNetwork {
     private let apiKey: String = "79d5894567be5b76ab7434fc12879584"
     private let baseURL: String = "https://api.themoviedb.org/3"
     private let imageURL: String = "https://image.tmdb.org/t/p/"
-    private let parameters: [String: String] = ["api_key": "79d5894567be5b76ab7434fc12879584"]
+    private let parameters: [String: String] = ["api_key": "79d5894567be5b76ab7434fc12879584", "language": MWSys.language.urlValue]
 
     private let errorHandler: ErrorHandler = { (errorCode, errors) in
         print("~~Errors~~")
@@ -54,8 +53,7 @@ class MWNetwork {
                 if let error = response.error {
                     errorHandler(.networkError(error: error))
                     return
-                } else if let data = response.data,
-                    let httpResponse = response.response {
+                } else if let data = response.data, let httpResponse = response.response {
                     switch httpResponse.statusCode {
                     case 200...300:
                         do {
@@ -64,8 +62,15 @@ class MWNetwork {
                         } catch let error {
                             errorHandler(.parsingError(error: error))
                         }
+                        break
                     case 401, 404:
-                        // TODO: - write error response model handling
+                        do {
+                            let responseError = try JSONDecoder().decode(MWResponseError.self, from: data)
+                            print("Reqest error: status code - \(responseError.code), message - \(responseError.message)")
+                            errorHandler(.responseError(error: responseError))
+                        } catch let error {
+                            errorHandler(.parsingError(error: error))
+                        }
                         break
                     default:
                         errorHandler(.serverError(statusCode: httpResponse.statusCode))
@@ -85,9 +90,10 @@ class MWNetwork {
         AF.request(url)
             .validate()
             .responseData { (response) in
-                if response.error == nil {
-                    handler(response.data)
+                if response.error != nil {
+                    self.errorHandler(response.response?.statusCode, response.error)
                 }
+                handler(response.data)
         }
     }
 }
