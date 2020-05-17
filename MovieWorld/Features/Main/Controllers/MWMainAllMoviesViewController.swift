@@ -67,8 +67,8 @@ class MWMainAllMoviesViewController: MWViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        Utility.hideActivityIndicator(view: self.view)
         self.setupData()
-
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(updateCategories),
                                                name: Constants.NCNames.categories,
@@ -85,21 +85,21 @@ class MWMainAllMoviesViewController: MWViewController {
         self.view.addSubview(self.tableView)
 
         self.makeConstraints()
+        Utility.showActivityIndicator(view: self.view, targetVC: self)
     }
 
     func fetchMovies(page: Int = 1) {
         let success: SuccessHandler = { [unowned self] (response: MWResponseMovie) in
             self.moviesInfo = response
-            debugPrint(response)
             self.fetchImages(movies: response.results)
         }
 
         let errors = { (error: MWNetError) in
             print(error)
+            Utility.hideActivityIndicator(view: self.view)
         }
 
-        var params: [String: String] = ["page": String(page)]
-        params["language"] = URLLanguage.by.urlValue
+        let params: [String: String] = ["page": String(page)]
 
         MWNet.sh.requestAlamofire(url: URLPaths.nowPlayingMovies,
                          parameters: params,
@@ -112,6 +112,7 @@ class MWMainAllMoviesViewController: MWViewController {
         movies.forEach ({ (movie) in
             let completion: CompetionImageHandler = { (data) in
                 movie.image = data
+
                 dispatch.leave()
             }
 
@@ -130,6 +131,7 @@ class MWMainAllMoviesViewController: MWViewController {
                 self.movies = movies
             }
             self.tableView.reloadData()
+            Utility.hideActivityIndicator(view: self.view)
             self.tableView.setNeedsUpdateConstraints()
         }
     }
@@ -208,10 +210,11 @@ extension MWMainAllMoviesViewController: UITableViewDelegate, UITableViewDataSou
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let movie = self.movies?[indexPath.row] {
+        if let id = self.movies?[indexPath.row].id {
             let moviesInSection = MWDetailMovieViewController()
-            moviesInSection.view.backgroundColor = .white
-            moviesInSection.getMovie(movieId: movie.id)
+            moviesInSection.initHandler = { () -> Int in
+                return id
+            }
 
             MWI.sh.push(vc: moviesInSection)
         }

@@ -11,11 +11,18 @@ import SnapKit
 
 typealias MoviesCatalog = (String, [MWMovie])
 
+struct MovieRequest {
+    let title: String
+    let url: String
+}
+
 class MWMainViewController: MWViewController {
     // MARK: - Variables
     private let tableViewInsets = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 0)
-    private var categories: [String] = ["Now Playing", "Popular", "Top Rated", "Upcoming"]
-    private var popularMovies: [MWMovie]?
+    private let movieRequests = [MovieRequest(title: "Popular", url: URLPaths.popularMovies),
+                                 MovieRequest(title: "Top Rated", url: URLPaths.topMovies),
+                                 MovieRequest(title: "Now Playing", url: URLPaths.nowPlayingMovies)]
+
     private var selectCategory: String?
     private let tableCellHeight: CGFloat = 240
 
@@ -35,55 +42,6 @@ class MWMainViewController: MWViewController {
         return tableView
     } ()
 
-    //MARK: - Fetch data for initialization
-    private func setupData() {
-        self.view.addSubview(self.tableView)
-        self.makeContraints()
-    }
-
-    func fetchPopularMovies() {
-        let success: SuccessHandler = { [weak self] (responseData: MWResponseMovie) in
-            guard let self = self else { return }
-            let movies: [MWMovie] = responseData.results
-
-            self.fetchImages(movies: movies)
-        }
-
-        let errors = { (error: MWNetError) in
-            switch error {
-            case .incorrectUrl(url: "123"):
-                print("incorrect url")
-            default:
-                print("ERROR")
-            }
-        }
-
-        MWNet.sh.requestAlamofire(url: URLPaths.popularMovies,
-                                  parameters: ["language": URLLanguage.by.urlValue],
-                                  successHandler: success,
-                                  errorHandler: errors)
-    }
-
-    func fetchImages(movies: [MWMovie]) {
-        let dispatch = DispatchGroup()
-        movies.forEach ({ (movie) in
-            let completion: CompetionImageHandler = { (data) in
-                movie.image = data
-                dispatch.leave()
-            }
-
-            dispatch.enter()
-            MWNet.sh.requestImage(imagePath: movie.poster,
-                              size: .w185,
-                              handler: completion)
-        })
-
-        dispatch.notify(queue: .main) {
-            self.popularMovies = movies
-            self.setupData()
-        }
-    }
-
     //MARK: - Add constraints
     func makeContraints() {
         self.tableView.snp.makeConstraints { (make) in
@@ -98,14 +56,20 @@ class MWMainViewController: MWViewController {
 
         self.view.backgroundColor = .white
         self.navigationItem.title = "Seasons"
-        self.fetchPopularMovies()
+        self.setupData()
+    }
+
+    //MARK: - Fetch data for initialization
+    private func setupData() {
+        self.view.addSubview(self.tableView)
+        self.makeContraints()
     }
 }
 
 //MARK: - TableView Delegate and DataSource Methods
 extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return  self.categories.count
+        return  self.movieRequests.count
     }
 
     func tableView(_ tableView: UITableView,
@@ -119,9 +83,8 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: MWMainTableCell.reuseIdentifier,
-        for: indexPath)
-        (cell as? MWMainTableCell)?.set(movies: self.popularMovies)
+        let cell = tableView.dequeueReusableCell(withIdentifier: MWMainTableCell.reuseIdentifier, for: indexPath)
+        (cell as? MWMainTableCell)?.set(url: self.movieRequests[indexPath.section].url)
 
         return cell
     }
@@ -130,7 +93,7 @@ extension MWMainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    viewForHeaderInSection section: Int) -> UIView? {
         let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: MWMainTableHeader.headerReuseId)
-        (header as? MWMainTableHeader)?.set(title: self.categories[section])
+        (header as? MWMainTableHeader)?.set(title: self.movieRequests[section].title)
 
         let headerTapGesture = UITapGestureRecognizer(target: self,
                                action: #selector(self.headerAllButtonClicked))

@@ -22,7 +22,7 @@ class MWMainCollectionCell: UICollectionViewCell {
     private var coverImage: UIImageView = {
         let iv = UIImageView()
         iv.cornerRadius = 5
-        iv.image = UIImage(named: Constants.Images.defaultCard)
+        iv.image = UIImage(named: Constants.Images.defaultMovie)
 
         return iv
     }()
@@ -77,7 +77,7 @@ class MWMainCollectionCell: UICollectionViewCell {
         self.subtitle.snp.makeConstraints { (make) in
             make.top.equalTo(self.title.snp.bottom)
             make.left.right.equalToSuperview()
-            make.bottom.lessThanOrEqualToSuperview().offset(5)
+            make.bottom.lessThanOrEqualToSuperview()//.offset(5)
         }
 
         super.updateConstraints()
@@ -86,6 +86,8 @@ class MWMainCollectionCell: UICollectionViewCell {
     func set(movie: MWMovie) {
         if let data = movie.image, let image = UIImage(data: data) {
             self.coverImage.image = image
+        } else {
+            self.coverImage.image = UIImage(named: Constants.Images.defaultMovie)
         }
         self.title.text = movie.title
         self.subtitle.text = movie.getSubtitle()

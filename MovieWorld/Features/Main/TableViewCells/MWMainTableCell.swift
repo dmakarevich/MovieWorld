@@ -42,7 +42,6 @@ class MWMainTableCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
         self.contentView.addSubview(collectionView)
-        self.updateConstraints()
     }
 
     required init?(coder: NSCoder) {
@@ -58,11 +57,56 @@ class MWMainTableCell: UITableViewCell {
         super.updateConstraints()
     }
 
-    func set(movies: [MWMovie]?) {
+    func set(url: String) {
+        if self.movies == nil {
+            self.fetchMovies(url: url)
+            Utility.showActivityIndicator(view: self.contentView)
+        }
+    }
+
+    private func setData(movies: [MWMovie]?) {
         self.movies = movies
         self.collectionView.reloadData()
         self.setNeedsUpdateConstraints()
     }
+
+    //MARK: - request methods for getting movies
+    private func fetchMovies(url: String) {
+        let success: SuccessHandler = { [weak self] (responseData: MWResponseMovie) in
+            guard let self = self else { return }
+            let movies: [MWMovie] = responseData.results
+
+            self.fetchImages(movies: movies)
+        }
+
+        let errors = { (error: MWNetError) in
+            print(error)
+        }
+
+        MWNet.sh.requestAlamofire(url: url,
+                                  successHandler: success,
+                                  errorHandler: errors)
+    }
+
+        func fetchImages(movies: [MWMovie]) {
+            let dispatch = DispatchGroup()
+            movies.forEach ({ (movie) in
+                let completion: CompetionImageHandler = { (data) in
+                    movie.image = data
+                    dispatch.leave()
+                }
+
+                dispatch.enter()
+                MWNet.sh.requestImage(imagePath: movie.poster,
+                                  size: .w185,
+                                  handler: completion)
+            })
+
+            dispatch.notify(queue: .main) {
+                Utility.hideActivityIndicator(view: self)
+                self.setData(movies: movies)
+            }
+        }
 }
 
 //MARK: - Collection view Datasource and Delegate Methods
@@ -86,10 +130,11 @@ extension MWMainTableCell: UICollectionViewDelegate, UICollectionViewDataSource 
                         didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as? MWMainCollectionCell
         let moviesInSection = MWDetailMovieViewController()
-        moviesInSection.view.backgroundColor = .white
 
         if let id = cell?.movieId {
-            moviesInSection.getMovie(movieId: id)
+            moviesInSection.initHandler = { () -> Int in
+                return id
+            }
 
             MWI.sh.push(vc: moviesInSection)
         }

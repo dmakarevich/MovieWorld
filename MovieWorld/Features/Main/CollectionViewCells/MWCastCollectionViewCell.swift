@@ -20,7 +20,7 @@ class MWCastCollectionViewCell: UICollectionViewCell {
     private var coverImage: UIImageView = {
         let iv = UIImageView()
         iv.cornerRadius = 5
-        iv.image = UIImage(named: Constants.Images.defaultCard)
+        iv.image = UIImage(named: Constants.Images.defaultPerson)
 
         return iv
     }()
@@ -84,6 +84,8 @@ class MWCastCollectionViewCell: UICollectionViewCell {
     func set(person: MWCast) {
         if let imageData = person.image, let image = UIImage(data: imageData) {
             self.coverImage.image = image
+        } else {
+            self.coverImage.image = UIImage(named: Constants.Images.defaultPerson)
         }
         self.title.text = person.name
         self.subtitle.text = person.character

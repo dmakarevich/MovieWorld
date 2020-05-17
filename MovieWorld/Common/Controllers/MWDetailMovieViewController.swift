@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import SnapKit
 
 class MWDetailMovieViewController: MWViewController {
     //MARK: - Variables
+    var initHandler: (() -> Int)?
+
     private let movieCardEdges = UIEdgeInsets(top: 16, left: 0, bottom: 12, right: 0)
     private let descriptionBlockEdges = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-    private let movieCrewHeaderEdges = UIEdgeInsets(top: 24, left: 16, bottom: 12, right: 26)
+    private let movieCrewHeaderEdges = UIEdgeInsets(top: 12, left: 16, bottom: 12, right: 26)
     private let collectionViewEdges = UIEdgeInsets(top: 4, left: 16, bottom: 12, right: 0)
 
     private var detailMovie: MWDetailMovie?
@@ -29,7 +32,6 @@ class MWDetailMovieViewController: MWViewController {
         return scrollView
     }()
 
-    //MARK: - Gui variables
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .horizontal
@@ -68,7 +70,7 @@ class MWDetailMovieViewController: MWViewController {
         })
 
         self.descriptionBlock.snp.makeConstraints({ (make) in
-            make.top.equalTo(self.movieCard.snp.bottom)
+            make.top.equalTo(self.movieCard.snp.bottom).offset(self.descriptionBlockEdges.top)
             make.left.right.equalTo(self.contentView)
         })
 
@@ -78,7 +80,7 @@ class MWDetailMovieViewController: MWViewController {
         })
 
         self.collectionView.snp.makeConstraints({ (make) in
-            make.top.equalTo(self.movieCrewHeader.snp.bottom).offset(self.collectionViewEdges.top)
+            make.top.equalTo(self.movieCrewHeader.snp.bottom)//.offset(self.collectionViewEdges.top)
             make.left.right.equalToSuperview().inset(self.collectionViewEdges)
             make.height.equalTo(155)
             make.bottom.lessThanOrEqualTo(self.contentView.snp.bottom).inset(self.collectionViewEdges.bottom)
@@ -91,22 +93,35 @@ class MWDetailMovieViewController: MWViewController {
         self.setupViews()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        self.disableLargeTitle()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        self.enableLargeTitle()
+    }
+
     func setupViews(){
+        self.view.backgroundColor = .white
         self.view.addSubview(self.scrollView)
         self.scrollView.addSubview(self.contentView)
         self.contentView.addSubview(self.movieCard)
         self.contentView.addSubview(self.descriptionBlock)
         self.contentView.addSubview(self.movieCrewHeader)
         self.contentView.addSubview(self.collectionView)
-        self.movieCrewHeader.set(title: "Cast")
+
+        let id = self.initHandler?()
+        if let id = id {
+            self.getMovie(movieId: id)
+            Utility.showActivityIndicator(view: self.view, targetVC: self)
+        }
     }
 
     func setData() {
         if let movie = self.detailMovie {
             self.movieCard.setData(movie: movie)
-            self.descriptionBlock.setData(description: movie.description,
-                                          runtime: movie.getRuntime(),
-                                          isAdult: movie.adult)
+            self.descriptionBlock.setData(movie: movie)
+            self.movieCrewHeader.set(title: "Cast", withoutRightView: true)
         }
 
         self.makeConstraints()
@@ -116,9 +131,8 @@ class MWDetailMovieViewController: MWViewController {
         self.detailMovie = model
         let handler: CompetionImageHandler = { (data) in
             guard let data = data else { return }
-            self.detailMovie?.image = data
 
-            self.fetchMovieCredits(movieId: model.id)
+            self.detailMovie?.image = data
         }
 
         MWNet.sh.requestImage(imagePath: model.poster,
@@ -130,13 +144,9 @@ class MWDetailMovieViewController: MWViewController {
         let success: SuccessHandler = { [weak self] (movie: MWDetailMovie) in
             guard let self = self else { return }
 
-            if let sizes = MWSys.sh.configuration?.posterSizes {
-                sizes.forEach({ (size) in
-                    debugPrint(size.rawValue)
-                })
-            }
+            self.detailMovie = movie
             self.getImage(model: movie)
-            self.fetchMovieCredits(movieId: movie.id)
+            self.fetchMovieCredits(id: movie.id)
         }
 
         let errors = { (error: MWNetError) in
@@ -146,25 +156,23 @@ class MWDetailMovieViewController: MWViewController {
         let url: String = URLPaths.movieById + String(movieId)
 
         MWNet.sh.requestAlamofire(url: url,
-                         parameters: ["language": URLLanguage.by.urlValue],
                          successHandler: success,
                          errorHandler: errors)
     }
 
-    func fetchMovieCredits(movieId: Int) {
+    func fetchMovieCredits(id: Int) {
         let success: SuccessHandler = { [weak self] (movieCrew: MWMovieCrew) in
             guard let self = self else { return }
+
             self.getCastImage(crew: movieCrew)
         }
 
         let errors = { (error: MWNetError) in
             print(error)
         }
-        let url = "/movie/\(movieId)/credits"
-        let params = ["language": URLLanguage.by.urlValue]
+        let url = "/movie/\(id)/credits"
 
         MWNet.sh.requestAlamofire(url: url,
-                         parameters: params,
                          successHandler: success,
                          errorHandler: errors)
     }
@@ -186,7 +194,7 @@ class MWDetailMovieViewController: MWViewController {
 
         dispatch.notify(queue: .main) {
             self.movieCrew = crew
-
+            Utility.hideActivityIndicator(view: self.view)
             self.setData()
             self.collectionView.reloadData()
         }
@@ -212,14 +220,14 @@ extension MWDetailMovieViewController: UICollectionViewDelegate, UICollectionVie
 
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
-//        let cell = collectionView.cellForItem(at: indexPath) as? MWCastCollectionViewCell
-        let moviesInSection = MWDetailMovieViewController()
-        moviesInSection.view.backgroundColor = .white
 
-//        if let id = cell?.movieId {
-//            moviesInSection.getMovie(movieId: id)
-//
-//            MWI.sh.push(vc: moviesInSection)
-//        }
+        let detailActorVC = MWDetailActorViewController()
+        if let id = self.movieCrew?.cast[indexPath.row].id {
+            detailActorVC.initHandler = { () -> Int in
+                return id
+            }
+
+            MWI.sh.push(vc: detailActorVC)
+        }
     }
 }
