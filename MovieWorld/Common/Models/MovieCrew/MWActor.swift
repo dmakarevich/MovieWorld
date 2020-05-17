@@ -52,4 +52,24 @@ class MWActor: Codable {
         try container.encode(self.placeOfBirth, forKey: .placeOfBirth)
         try container.encode(self.poster, forKey: .poster)
     }
+
+    func getAgeInYears() -> String {
+        let age = Calendar.current.dateComponents([.year], from: self.birthday, to: Date()).year ?? 0
+        return "(\(age)" + " years)"
+    }
+
+    func getStringBirthday() -> String {
+        var result: String = ""
+        if let day = Calendar.current.dateComponents([.day], from: self.birthday).day,
+            let month = Calendar.current.dateComponents([.month], from: self.birthday).month,
+            let year = Calendar.current.dateComponents([.year], from: self.birthday).year {
+            result = String(day) + "." + String(month) + "." + String(year)
+        }
+
+        return result
+    }
+
+    func getBirdayAndYears() -> String {
+        return self.getStringBirthday() + " to date, " + self.getAgeInYears()
+    }
 }

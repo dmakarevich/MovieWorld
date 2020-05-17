@@ -85,7 +85,7 @@ class MWActorCardView: MWShadowView {
 
     func setData(actor: MWActor) {
         self.nameLabel.text = actor.name
-        self.ageLabel.text = "\(actor.birthday)"
+        self.ageLabel.text = actor.getBirdayAndYears()
         var image: UIImage?
         if let imagedata = actor.image {
             image = UIImage(data: imagedata)
