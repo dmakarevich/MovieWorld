@@ -12,7 +12,7 @@ struct Constants {
     static let emptyString: String = ""
     static let commaDelimiter: String = ", "
     static let buttonCornerRadius: CGFloat = 5
-    static let runtime: String = " минут"
+    static let runtime: String = " minutes"
 
     struct NCNames {
         static let categories = Notification.Name("GenresMovie")
@@ -30,7 +30,8 @@ struct Constants {
     }
 
     struct Images {
-        static let defaultCard: String = "defaultCard"
+        static let defaultMovie: String = "defaultMovie"
+        static let defaultPerson: String = "defaultPerson"
     }
 
     struct FontSize {

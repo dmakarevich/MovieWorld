@@ -57,7 +57,11 @@ class MWHeaderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func set(title: String) {
+    func set(title: String, withoutRightView: Bool = false) {
         self.titleLabel.text = title
+        if withoutRightView {
+            self.allView.snp.removeConstraints()
+            self.allView.removeFromSuperview()
+        }
     }
 }
