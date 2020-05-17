@@ -6,7 +6,7 @@
 //  Copyright © 2020 Admin. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 struct Utility {
     static func stringToDate(dateString: String) -> Date {
@@ -14,5 +14,23 @@ struct Utility {
         formatter.dateFormat = "yyyy-MM-dd"
 
         return formatter.date(from: dateString) ?? Date()
+    }
+
+    static func showActivityIndicator(view: UIView, targetVC: UIViewController) {
+        let activityIndicator = UIActivityIndicatorView()
+
+        activityIndicator.backgroundColor = .white
+        activityIndicator.center = targetVC.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = .large
+        activityIndicator.tag = 1
+        activityIndicator.color = UIColor(named: Constants.Colors.accentColor)
+        view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+    }
+
+    static func hideActivityIndicator(view: UIView) {
+        let activityIndicator = view.viewWithTag(1) as? UIActivityIndicatorView
+        activityIndicator?.stopAnimating()
     }
 }
