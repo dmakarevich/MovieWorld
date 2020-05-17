@@ -16,11 +16,11 @@ struct Utility {
         return formatter.date(from: dateString) ?? Date()
     }
 
-    static func showActivityIndicator(view: UIView, targetVC: UIViewController = MWViewController()) {
+    static func showActivityIndicator(view: UIView) {
         let activityIndicator = UIActivityIndicatorView()
 
         activityIndicator.backgroundColor = .white
-        activityIndicator.center = view.center//targetVC.view.center
+        activityIndicator.center = view.center
         activityIndicator.hidesWhenStopped = true
         activityIndicator.style = .large
         activityIndicator.tag = 1

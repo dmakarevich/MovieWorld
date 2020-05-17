@@ -104,7 +104,7 @@ class MWDetailActorViewController: MWViewController {
         let id = self.initHandler?()
         if let id = id {
             self.fetchActorDetail(id: id)
-            Utility.showActivityIndicator(view: self.view, targetVC: self)
+            Utility.showActivityIndicator(view: self.view)
         }
     }
 

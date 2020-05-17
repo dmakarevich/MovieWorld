@@ -81,7 +81,6 @@ class MWDetailMovie: MWMovie {
     }
 
     func getRuntime() -> String {
-        print(self.runtime)
         return "  " + String(self.runtime) + Constants.runtime
     }
 }

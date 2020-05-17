@@ -85,7 +85,7 @@ class MWMainAllMoviesViewController: MWViewController {
         self.view.addSubview(self.tableView)
 
         self.makeConstraints()
-        Utility.showActivityIndicator(view: self.view, targetVC: self)
+        Utility.showActivityIndicator(view: self.view)
     }
 
     func fetchMovies(page: Int = 1) {

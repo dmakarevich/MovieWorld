@@ -113,7 +113,7 @@ class MWDetailMovieViewController: MWViewController {
         let id = self.initHandler?()
         if let id = id {
             self.getMovie(movieId: id)
-            Utility.showActivityIndicator(view: self.view, targetVC: self)
+            Utility.showActivityIndicator(view: self.view)
         }
     }
 
