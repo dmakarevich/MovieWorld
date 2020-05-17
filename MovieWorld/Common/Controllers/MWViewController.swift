@@ -26,4 +26,14 @@ class MWViewController: UIViewController {
         super.viewDidLoad()
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: Constants.emptyString, style: .plain, target: nil, action: nil)
     }
+
+    func enableLargeTitle() {
+        let navBar = self.navigationController?.navigationBar
+        navBar?.prefersLargeTitles = true
+    }
+
+    func disableLargeTitle() {
+        let navBar = self.navigationController?.navigationBar
+        navBar?.prefersLargeTitles = false
+    }
 }
