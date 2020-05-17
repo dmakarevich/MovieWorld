@@ -8,7 +8,7 @@
 
 import Foundation
 
-class MWCrew: MWPerson {
+class MWCrew: MWCrewPerson {
     enum CodingKeys: String, CodingKey {
         case department
         case job

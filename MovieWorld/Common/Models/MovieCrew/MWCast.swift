@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class MWCast: MWPerson {
+class MWCast: MWCrewPerson {
     enum CodingKeys: String, CodingKey {
         case character
         case order
