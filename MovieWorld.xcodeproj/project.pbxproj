@@ -19,6 +19,7 @@
 		8445CFC8246D8C2F00D8417E /* MWCrew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8445CFC7246D8C2F00D8417E /* MWCrew.swift */; };
 		8446D9B4245B3231005DF2B7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8446D9B2245B3231005DF2B7 /* Constants.swift */; };
 		8446D9B5245B3231005DF2B7 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8446D9B3245B3231005DF2B7 /* Utility.swift */; };
+		8447086524726DC90025930B /* MWLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8447086424726DC80025930B /* MWLoadingView.swift */; };
 		84478E8524599C7400F08586 /* MWDetailMovie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84478E8424599C7400F08586 /* MWDetailMovie.swift */; };
 		84478E872459AB4500F08586 /* MWConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84478E862459AB4500F08586 /* MWConfiguration.swift */; };
 		8447CAC7245AE61F00261487 /* MWCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8447CAC6245AE61F00261487 /* MWCountry.swift */; };
@@ -73,6 +74,7 @@
 		8445CFC7246D8C2F00D8417E /* MWCrew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MWCrew.swift; sourceTree = "<group>"; };
 		8446D9B2245B3231005DF2B7 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		8446D9B3245B3231005DF2B7 /* Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		8447086424726DC80025930B /* MWLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MWLoadingView.swift; sourceTree = "<group>"; };
 		84478E8424599C7400F08586 /* MWDetailMovie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MWDetailMovie.swift; sourceTree = "<group>"; };
 		84478E862459AB4500F08586 /* MWConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MWConfiguration.swift; sourceTree = "<group>"; };
 		8447CAC6245AE61F00261487 /* MWCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MWCountry.swift; sourceTree = "<group>"; };
@@ -284,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				8485EA1124240208001E6010 /* MWMainTableHeader.swift */,
+				8447086424726DC80025930B /* MWLoadingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -606,6 +609,7 @@
 				84E684982400193B00755BF8 /* MWInterface.swift in Sources */,
 				8485EA0D24224B89001E6010 /* MWMainCollectionCell.swift in Sources */,
 				84E134D824168A79001F2DC7 /* MWMainViewController.swift in Sources */,
+				8447086524726DC90025930B /* MWLoadingView.swift in Sources */,
 				847EE33823F9587100BD3957 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

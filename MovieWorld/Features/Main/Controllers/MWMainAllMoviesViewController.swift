@@ -17,6 +17,13 @@ class MWMainAllMoviesViewController: MWViewController {
     private var tableCellHieght: CGFloat = 125
     private var collectionViewHieght: CGFloat = 92
 
+    // MARK: - Loading variables
+    private var isUpdating: Bool = false
+    private let tableUpdateIndicatorView = MWLoadingView()
+    private var tableUpdateIndicatorViewHeight: CGFloat {
+        return self.isUpdating ? 50 : 0
+    }
+
     // MARK: - Gui variables
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
@@ -59,15 +66,27 @@ class MWMainAllMoviesViewController: MWViewController {
 
         self.tableView.snp.makeConstraints { (make) in
             make.top.equalTo(self.collectionView.snp.bottom)
-            make.bottom.left.right.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
+
+        self.tableUpdateIndicatorView.snp.makeConstraints({ (make) in
+            make.top.lessThanOrEqualTo(self.tableView.snp.bottom)
+            make.left.right.equalToSuperview()
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide.snp.bottom)
+            make.height.equalTo(self.tableUpdateIndicatorViewHeight)
+        })
+    }
+
+    private func updateHeightIndicatorView() {
+        self.tableUpdateIndicatorView.snp.updateConstraints({ (update) in
+            update.height.equalTo(self.tableUpdateIndicatorViewHeight)
+        })
     }
 
     //MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        Utility.hideActivityIndicator(view: self.view)
         self.setupData()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(updateCategories),
@@ -83,6 +102,7 @@ class MWMainAllMoviesViewController: MWViewController {
 
         self.view.addSubview(self.collectionView)
         self.view.addSubview(self.tableView)
+        self.view.addSubview(self.tableUpdateIndicatorView)
 
         self.makeConstraints()
         Utility.showActivityIndicator(view: self.view)
@@ -130,9 +150,20 @@ class MWMainAllMoviesViewController: MWViewController {
             } else {
                 self.movies = movies
             }
+
+            self.hideActivityIndicator()
             self.tableView.reloadData()
-            Utility.hideActivityIndicator(view: self.view)
             self.tableView.setNeedsUpdateConstraints()
+        }
+    }
+
+    private func hideActivityIndicator() {
+        if self.isUpdating {
+            self.isUpdating = false
+            self.updateHeightIndicatorView()
+            self.tableUpdateIndicatorView.stop()
+        } else {
+            Utility.hideActivityIndicator(view: self.view)
         }
     }
 
@@ -204,6 +235,10 @@ extension MWMainAllMoviesViewController: UITableViewDelegate, UITableViewDataSou
                    forRowAt indexPath: IndexPath) {
         if let movies = self.movies, indexPath.row == movies.count - 3 {
             if let moviesInfo = self.moviesInfo, moviesInfo.hasNextPage() {
+                self.isUpdating = true
+                self.updateHeightIndicatorView()
+                self.tableUpdateIndicatorView.start()
+
                 self.fetchMovies(page: moviesInfo.page + 1)
             }
         }
