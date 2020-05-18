@@ -19,31 +19,3 @@ struct URLPaths {
     static let actorById: String = "/person/"
     static let discoverMovie: String = "/discover/movie"
 }
-
-enum URLPath {
-    case popularMovies
-    case topMovies
-    case nowPlayingMovies
-
-    var urlValue: String {
-        switch self {
-        case .popularMovies:
-            return "/movie/popular"
-        case .topMovies:
-            return "/movie/top_rated"
-        case .nowPlayingMovies:
-            return "/movie/now_playing"
-        }
-    }
-
-    var getTitle: String {
-        switch self {
-        case .popularMovies:
-            return "Popular Movies"
-        case .topMovies:
-            return "Top movies"
-        case .nowPlayingMovies:
-            return "Now Playing"
-        }
-    }
-}

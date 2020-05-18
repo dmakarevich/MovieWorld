@@ -11,8 +11,12 @@ import UIKit
 struct Constants {
     static let emptyString: String = ""
     static let commaDelimiter: String = ", "
+    static let point: String = "."
     static let buttonCornerRadius: CGFloat = 5
     static let runtime: String = " minutes"
+    static let toDate: String = "  to date, "    
+    static let yearsOld: String = " years"
+
 
     struct NCNames {
         static let categories = Notification.Name("GenresMovie")
