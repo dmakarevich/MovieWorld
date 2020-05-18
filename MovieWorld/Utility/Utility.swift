@@ -32,5 +32,6 @@ struct Utility {
     static func hideActivityIndicator(view: UIView) {
         let activityIndicator = view.viewWithTag(1) as? UIActivityIndicatorView
         activityIndicator?.stopAnimating()
+        activityIndicator?.removeFromSuperview()
     }
 }
