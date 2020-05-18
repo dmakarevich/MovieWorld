@@ -54,8 +54,13 @@ class MWActor: Codable {
     }
 
     func getAgeInYears() -> String {
-        let age = Calendar.current.dateComponents([.year], from: self.birthday, to: Date()).year ?? 0
-        return "(\(age)" + " years)"
+        var years = ""
+        let age = Calendar.current.dateComponents([.year], from: self.birthday, to: Date()).year
+        if let age = age {
+            years = "(\(age)" + " years)"
+        }
+
+        return years
     }
 
     func getStringBirthday() -> String {
@@ -70,6 +75,6 @@ class MWActor: Codable {
     }
 
     func getBirdayAndYears() -> String {
-        return self.getStringBirthday() + " to date, " + self.getAgeInYears()
+        return self.getAgeInYears().isEmpty ? "" : self.getStringBirthday() + " to date, " + self.getAgeInYears()
     }
 }
