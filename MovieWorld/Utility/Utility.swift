@@ -9,11 +9,11 @@
 import UIKit
 
 struct Utility {
-    static func stringToDate(dateString: String) -> Date {
+    static func stringToDate(dateString: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
 
-        return formatter.date(from: dateString) ?? Date()
+        return formatter.date(from: dateString)
     }
 
     static func showActivityIndicator(view: UIView) {

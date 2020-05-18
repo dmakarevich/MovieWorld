@@ -18,8 +18,8 @@ class MWActor: Codable {
     let id: Int
     let name: String
     let gender: Int
-    let birthday: Date
-    let deathday: Date
+    let birthday: Date?
+    let deathday: Date?
     let biography: String
     let placeOfBirth: String
     let poster: String
@@ -55,9 +55,17 @@ class MWActor: Codable {
 
     func getAgeInYears() -> String {
         var years = ""
-        let age = Calendar.current.dateComponents([.year], from: self.birthday, to: Date()).year
-        if let age = age {
-            years = "(\(age)" + " years)"
+        var toDate = Date()
+        if let deathday = self.deathday {
+            toDate = deathday
+        }
+        if let birthday = self.birthday {
+            let age = Calendar.current.dateComponents([.year],
+                                                      from: birthday,
+                                                      to: toDate).year
+            if let age = age {
+                years = "(\(age)" + " years)"
+            }
         }
 
         return years
@@ -65,9 +73,10 @@ class MWActor: Codable {
 
     func getStringBirthday() -> String {
         var result: String = ""
-        if let day = Calendar.current.dateComponents([.day], from: self.birthday).day,
-            let month = Calendar.current.dateComponents([.month], from: self.birthday).month,
-            let year = Calendar.current.dateComponents([.year], from: self.birthday).year {
+        if let birthday = self.birthday,
+            let day = Calendar.current.dateComponents([.day], from: birthday).day,
+            let month = Calendar.current.dateComponents([.month], from: birthday).month,
+            let year = Calendar.current.dateComponents([.year], from: birthday).year {
             result = String(day) + "." + String(month) + "." + String(year)
         }
 

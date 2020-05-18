@@ -28,7 +28,7 @@ class MWMovie: Codable {
     let originalLanguage: String
     let categoryIds: [Int]
     let description: String
-    let releaseDate: Date
+    let releaseDate: Date?
     let adult: Bool
     let poster: String
     let backdropPath: String
@@ -94,7 +94,9 @@ class MWMovie: Codable {
 
     func getReleaseYear() -> String? {
         var result: String?
-        if let year = Calendar.current.dateComponents([.year], from: self.releaseDate).year {
+        if let releaseDate = self.releaseDate,
+            let year = Calendar.current.dateComponents([.year],
+                                                       from: releaseDate).year {
             result = String(year)
         }
 
