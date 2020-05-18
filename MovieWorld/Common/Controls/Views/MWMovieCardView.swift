@@ -105,8 +105,8 @@ class MWMovieCardView: MWShadowView {
         self.subtitle.text = movie.getSubtitle()
         self.categories.text = movie.getCategoryString()
         var image: UIImage?
-        if let imagedata = movie.image {
-            image = UIImage(data: imagedata)
+        if let imagedata = movie.image, let img = UIImage(data: imagedata) {
+            image = img
         } else {
             image = UIImage(named: Constants.Images.defaultMovie)
         }

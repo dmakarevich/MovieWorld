@@ -87,10 +87,10 @@ class MWActorCardView: MWShadowView {
         self.nameLabel.text = actor.name
         self.ageLabel.text = actor.getBirdayAndYears()
         var image: UIImage?
-        if let imagedata = actor.image {
-            image = UIImage(data: imagedata)
+        if let imagedata = actor.image, let img = UIImage(data: imagedata) {
+            image = img
         } else {
-            image = UIImage(named: Constants.Images.defaultMovie)
+            image = UIImage(named: Constants.Images.defaultPerson)
         }
         self.coverImage.image = image
     }
