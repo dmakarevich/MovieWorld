@@ -83,7 +83,7 @@ class MWDetailActorViewController: MWViewController {
         })
 
         self.descriptionBlock.snp.makeConstraints({ (make) in
-            make.top.equalTo(self.collectionView.snp.bottom).inset(self.descriptionBlockEdges.top)
+            make.top.equalTo(self.collectionView.snp.bottom).offset(self.descriptionBlockEdges.top)
             make.left.right.equalTo(self.contentView)
             make.bottom.lessThanOrEqualToSuperview().inset(self.descriptionBlockEdges.bottom)
         })
