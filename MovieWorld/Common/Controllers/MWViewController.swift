@@ -9,24 +9,31 @@
 import UIKit
 
 class MWViewController: UIViewController {
-    
+    //MARK: - Variables
     var barTitle: String?
-    var barImage: String = ""
-    
+    var barImage: String = Constants.emptyString
+
+    //MARK: - Initialization
     func setup(title: String, imageName: String) {
         self.title = title
         self.barImage = imageName
-        
+
         self.tabBarItem.title = self.barTitle
         self.tabBarItem.image = UIImage(named: self.barImage)
     }
-  
-    func createNavigationVC() -> UINavigationController {
-        let recentVC = UINavigationController(rootViewController: self)
-        recentVC.tabBarItem.title = self.title
-        recentVC.tabBarItem.image = UIImage(named: self.barImage)
-        
-        return recentVC
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: Constants.emptyString, style: .plain, target: nil, action: nil)
     }
-    
+
+    func enableLargeTitle() {
+        let navBar = self.navigationController?.navigationBar
+        navBar?.prefersLargeTitles = true
+    }
+
+    func disableLargeTitle() {
+        let navBar = self.navigationController?.navigationBar
+        navBar?.prefersLargeTitles = false
+    }
 }

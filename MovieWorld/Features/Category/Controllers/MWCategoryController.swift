@@ -14,7 +14,6 @@ class MWCategoryController: MWViewController {
         super.viewDidLoad()
         self.view.backgroundColor = .darkGray
         self.navigationController?.title = "Category"
-        
     }
 
 }
